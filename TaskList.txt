@@ -1,0 +1,7 @@
+
+
+
+	Stencil : 
+--> Remplir le stencil 
+--> Utiliser une camera liée à un stencil. 
+-->  

@@ -7,7 +7,18 @@ Properties {
 }
 SubShader {
 	Pass {
-		ZTest Always Cull Off ZWrite Off Fog { Mode off } //Parametrage du shader pour éviter de lire, écrire dans le zbuffer, désactiver le culling et le brouillard sur le polygone
+	Tags
+	{
+		"RenderType" = "Opaque"
+		"Queue" = "Geometry+1"
+	}
+	Stencil{
+		Ref 2
+		Comp equal
+		Pass Keep
+		}
+	//ZTest Always Cull Off ZWrite Off Fog{ Mode off } //Parametrage du shader pour éviter de lire, écrire dans le zbuffer, désactiver le culling et le brouillard sur le polygone
+		ZTest Always Cull Off  Fog { Mode off } //Parametrage du shader pour éviter de lire, écrire dans le zbuffer, désactiver le culling et le brouillard sur le polygone
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -44,7 +55,8 @@ SubShader {
 
             float4 frag(Vertex2Pixel i) : COLOR 
             {
-                return tex2D(_MainTex,i.uv.xy); //On renvoit la couleur reçue
+				//return tex2D(_MainTex,i.uv.xy); //On renvoit la couleur reçue
+				return float4(1,1,0,1); //On renvoit la couleur reçue
             }
 ENDCG 
 	}

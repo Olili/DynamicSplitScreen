@@ -7,6 +7,9 @@ namespace VoronoiSplitScreen
     public class SplitScreenManager : MonoBehaviour
     {
         [SerializeField] GameObject[] targets;
+        [SerializeField] Camera stencilCamera;
+
+
     }
 }
 
