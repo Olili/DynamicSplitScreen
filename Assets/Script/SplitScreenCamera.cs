@@ -22,30 +22,33 @@ namespace VoronoiSplitScreen
         {
             //stencilBufferRt = new RenderTexture(Screen.width, Screen.height, 24);
         }
-        private void OnRenderImage(RenderTexture source, RenderTexture destination)
-        {
-            Graphics.Blit(source, destination, checkStencil);
-        }
         //private void OnRenderImage(RenderTexture source, RenderTexture destination)
         //{
-        //    stencilBufferRt = RenderTexture.GetTemporary(Screen.width, Screen.height,24);
-        //    Graphics.SetRenderTarget(stencilBufferRt.colorBuffer, source.depthBuffer);
-        //    //    // base : 
-        //    //Graphics.Blit(source, destination, checkStencil);
-
-        //    //// exemple 
-        //    Graphics.Blit(source, stencilBufferRt, checkStencil);
-        //    Graphics.Blit(stencilBufferRt, destination);
-
-
-        //    //// allOfIt
-        //    //Graphics.Blit(source, stencilBufferRt, checkStencil);
-        //    //Graphics.Blit(stencilBufferRt, destination, checkStencil);
-
-        //    //    // test etrange : 
-        //    //Graphics.Blit(stencilBufferRt, destination, checkStencil);
+        //    Graphics.Blit(source, destination, checkStencil);
         //}
+        private void OnRenderImage(RenderTexture source, RenderTexture destination)
+        {
+            stencilBufferRt = RenderTexture.GetTemporary(Screen.width, Screen.height, 32);
+            Graphics.SetRenderTarget(stencilBufferRt.colorBuffer, source.depthBuffer);
+            //    // base : 
+            //Graphics.Blit(source, destination, checkStencil);
 
+            //// exemple 
+            //Graphics.Blit(source, stencilBufferRt, checkStencil);
+            //Graphics.Blit(stencilBufferRt, destination);
+            Graphics.Blit(source, destination);
+
+            //// allOfIt
+            //Graphics.Blit(source, stencilBufferRt, checkStencil);
+            //Graphics.Blit(stencilBufferRt, destination, checkStencil);
+
+            //    // test etrange : 
+            //Graphics.Blit(stencilBufferRt, destination, checkStencil);
+        }
+        private void OnPostRender()
+        {
+            RenderTexture.ReleaseTemporary(stencilBufferRt);
+        }
 
 
         //public void OnPostRender()
@@ -94,10 +97,7 @@ namespace VoronoiSplitScreen
 
         //    Graphics.Blit(stencilBufferRt, destination);
         //}
-        //private void OnPostRender()
-        //{
-        //    RenderTexture.ReleaseTemporary(stencilBufferRt);
-        //}
+
 
 
     }

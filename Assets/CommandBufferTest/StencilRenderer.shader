@@ -1,16 +1,14 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Hidden/SplitScreen" {
+Shader "Hidden/StencilRenderer" {
 Properties {
-	//_MainTex ("", 2D) = "" {}
-
 }
 SubShader {
 	Pass {
 	Tags
 	{
 		"RenderType" = "Opaque"
-		"Queue" = "Geometry+1"
+		"Queue" = "Geometry"
 	}
 	Stencil{
 		Ref 0
@@ -24,8 +22,7 @@ SubShader {
 			#pragma vertex vert
 			#pragma fragment frag
 
-			//sampler2D _MainTex;
-			sampler2D _RenderTexture;
+			sampler2D CameraRd;
 
 			struct Prog2Vertex {
 	            float4 vertex : POSITION; 	//Les "registres" précisés après chaque variable servent
@@ -48,17 +45,23 @@ SubShader {
 			Vertex2Pixel vert (Prog2Vertex i)
 			{
 				Vertex2Pixel o;
-		        o.pos = UnityObjectToClipPos (i.vertex); //Projection du modèle 3D, cette ligne est obligatoire
+				//o.pos = UnityObjectToClipPos(i.vertex); //Projection du modèle 3D, cette ligne est obligatoire
+				o.pos = i.vertex; //Projection du modèle 3D, cette ligne est obligatoire
+
+				//o.pos.x = o.pos.x*_ScreenParams.z*1; //Projection du modèle 3D, cette ligne est obligatoire
+				//o.pos.y = (o.pos.y*4-1)*_ScreenParams.w; //Projection du modèle 3D, cette ligne est obligatoire
+				//o.pos.y = (o.pos.y-0.25)*_ScreenParams.w*2; //Projection du modèle 3D, cette ligne est obligatoire
 		        o.uv=i.texcoord; //UV de la texture
 		      	
 		      	return o;
 			}
 
-            float4 frag(Vertex2Pixel i) : COLOR 
-            {
-				//return tex2D(_MainTex,i.uv.xy); //On renvoit la couleur reçue
-				return tex2D(_RenderTexture,i.uv.xy); //On renvoit la couleur reçue
-				//return float4(1,1,0,1); //On renvoit la couleur reçue
+			float4 frag(Vertex2Pixel i) : COLOR
+			{
+				//return tex2D(CameraRd,i.uv.xy);
+				return float4(i.uv.x,1, i.uv.y, 1);
+				//return float4(0,0,0,1);
+				//return float4(1,0,0,1);
             }
 ENDCG 
 	}

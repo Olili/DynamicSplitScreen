@@ -1,8 +1,8 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Hidden/SplitScreen" {
+Shader "Hidden/PostProcess" {
 Properties {
-	//_MainTex ("", 2D) = "" {}
+	_MainTex ("", 2D) = "" {}
 
 }
 SubShader {
@@ -24,8 +24,7 @@ SubShader {
 			#pragma vertex vert
 			#pragma fragment frag
 
-			//sampler2D _MainTex;
-			sampler2D _RenderTexture;
+			sampler2D _MainTex;
 
 			struct Prog2Vertex {
 	            float4 vertex : POSITION; 	//Les "registres" précisés après chaque variable servent
@@ -56,9 +55,8 @@ SubShader {
 
             float4 frag(Vertex2Pixel i) : COLOR 
             {
-				//return tex2D(_MainTex,i.uv.xy); //On renvoit la couleur reçue
-				return tex2D(_RenderTexture,i.uv.xy); //On renvoit la couleur reçue
-				//return float4(1,1,0,1); //On renvoit la couleur reçue
+				return tex2D(_MainTex,i.uv.xy); //On renvoit la couleur reçue
+			//	return float4(1,1,0,1); //On renvoit la couleur reçue
             }
 ENDCG 
 	}
