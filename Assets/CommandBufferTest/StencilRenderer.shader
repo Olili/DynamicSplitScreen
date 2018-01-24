@@ -22,7 +22,8 @@ SubShader {
 			#pragma vertex vert
 			#pragma fragment frag
 
-			sampler2D CameraRd;
+			sampler2D MyCameraRd;
+			//sampler2D _MainTex;
 
 			struct Prog2Vertex {
 	            float4 vertex : POSITION; 	//Les "registres" précisés après chaque variable servent
@@ -45,21 +46,19 @@ SubShader {
 			Vertex2Pixel vert (Prog2Vertex i)
 			{
 				Vertex2Pixel o;
-				//o.pos = UnityObjectToClipPos(i.vertex); //Projection du modèle 3D, cette ligne est obligatoire
 				o.pos = i.vertex; //Projection du modèle 3D, cette ligne est obligatoire
-
-				//o.pos.x = o.pos.x*_ScreenParams.z*1; //Projection du modèle 3D, cette ligne est obligatoire
-				//o.pos.y = (o.pos.y*4-1)*_ScreenParams.w; //Projection du modèle 3D, cette ligne est obligatoire
-				//o.pos.y = (o.pos.y-0.25)*_ScreenParams.w*2; //Projection du modèle 3D, cette ligne est obligatoire
-		        o.uv=i.texcoord; //UV de la texture
+				//o.pos.xy *= 2;
+		        o.uv=i.texcoord ; //UV de la texture
+				o.uv.y = -o.uv.y + 1;
 		      	
 		      	return o;
 			}
 
 			float4 frag(Vertex2Pixel i) : COLOR
 			{
-				//return tex2D(CameraRd,i.uv.xy);
-				return float4(i.uv.x,1, i.uv.y, 1);
+				//return tex2D(MyCameraRd,i.uv.xy);
+				return tex2D(MyCameraRd,i.uv.xy);
+				//return float4(i.uv.x,1, i.uv.y, 1);
 				//return float4(0,0,0,1);
 				//return float4(1,0,0,1);
             }

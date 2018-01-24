@@ -456,11 +456,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf6261c9ced98e34590b18936b98fd09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  postProcessMat: {fileID: 2100000, guid: 78197ecb2cee7684ea8bd66bcd209351, type: 2}
-  material: {fileID: 2100000, guid: 40075c06939560f49bdd699df68feffd, type: 2}
-  mask2: {fileID: 2100000, guid: 2659029051f51214e82f34f833171c23, type: 2}
-  stencilRenderer: {fileID: 2100000, guid: 17cc9d824a547bb4495a6f0e4885724a, type: 2}
   quad: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  stencilRenderer: {fileID: 2100000, guid: 17cc9d824a547bb4495a6f0e4885724a, type: 2}
+  id: 0
 --- !u!81 &978332796
 AudioListener:
   m_ObjectHideFlags: 0

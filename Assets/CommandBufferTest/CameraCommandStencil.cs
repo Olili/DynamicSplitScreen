@@ -2,76 +2,86 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using VoronoiSplitScreen;
+
+
 
 public class CameraCommandStencil : MonoBehaviour {
 
-    private CommandBuffer cmdBuffer;
-    public  Material postProcessMat; // gère l'affichage partiel de ce que filme une camera selon le stencil
-    public  Material material; // gère l'affichage partiel de ce que filme une camera selon le stencil
-    public  Material mask2; // gère l'affichage partiel de ce que filme une camera selon le stencil
-    public Material stencilRenderer;
+   
+    Mesh quadPerso;
+    [SerializeField]private Mesh unityQuad;
 
-    private RenderTargetIdentifier stencilTempTextureID;
-    private RenderTexture stencilTempTexture;
-    [SerializeField]private Mesh quad;
+    private CommandBuffer cmdBuffer;
+    public Material stencilRenderer;
+    [SerializeField] private int id;
+#region getterSetters
+
+    public int Id
+    {
+        get
+        {
+            return id;
+        }
+
+        set
+        {
+            id = value;
+        }
+    }
+#endregion
 
     void Start () {
 
         List<Vector3> vertices = new List<Vector3>();
-        quad.GetVertices(vertices);
+        unityQuad.GetVertices(vertices);
         foreach (Vector3 vertex in vertices)
         {
-            Debug.Log(vertex);
+            Debug.Log("v : "+vertex);
         }
-
+        List<Vector2> Uvs = new List<Vector2>();
+        unityQuad.GetUVs(0,Uvs);
+        foreach (Vector2 uv in Uvs)
+        {
+            Debug.Log("Uv :" + uv);
+        }
+        int[] indices = unityQuad.GetIndices(0);
+        foreach (int id in indices)
+        {
+            Debug.Log("id :" + id);
+        }
+        int[] triangles = unityQuad.GetTriangles(0);
+        foreach (int triangle in triangles)
+        {
+            Debug.Log("triangle :" + triangle);
+        }
+        unityQuad.RecalculateNormals();
+        unityQuad.RecalculateBounds();
 
     }
-    RenderTexture temporaryRt;
     void OnEnable()
     {
-        //// Endless Miror
-        //if (cmdBuffer == null)
-        //{
-        //    cmdBuffer = new CommandBuffer();
-        //    cmdBuffer.name = "Highlight Occluded Objects";
-        //    int texID = Shader.PropertyToID("CameraRd");
-        //    cmdBuffer.GetTemporaryRT(texID, -1, -1, 0, FilterMode.Bilinear);
-        //    stencilRenderer.SetTexture(texID, RenderTexture.active);
-        //    cmdBuffer.DrawMesh(quad, Matrix4x4.identity, stencilRenderer, 0, 0);
-        //    cmdBuffer.Blit(BuiltinRenderTextureType.CameraTarget, texID);
-        //    cmdBuffer.Blit(texID, BuiltinRenderTextureType.CameraTarget);
-        //    GetComponent<Camera>().AddCommandBuffer(CameraEvent.BeforeImageEffects, cmdBuffer);
-        //}
-        //// minimum mirror : 
-        //if (cmdBuffer == null)
-        //{
-        //    cmdBuffer = new CommandBuffer();
-        //    cmdBuffer.name = "Highlight Occluded Objects";
-        //    int texID = Shader.PropertyToID("CameraRd");
-        //    cmdBuffer.GetTemporaryRT(texID, -1, -1, 0, FilterMode.Bilinear);
-        //    cmdBuffer.DrawMesh(quad, Matrix4x4.identity, stencilRenderer, 0, 0);
-        //    cmdBuffer.Blit(BuiltinRenderTextureType.CameraTarget, texID);
-        //    GetComponent<Camera>().AddCommandBuffer(CameraEvent.BeforeImageEffects, cmdBuffer);
-        //}
+        if (quadPerso == null)
+            quadPerso = MeshHelper.GetQuad();
         if (cmdBuffer == null)
         {
             cmdBuffer = new CommandBuffer();
-            cmdBuffer.name = "Highlight Occluded Objects";
-            int texID = Shader.PropertyToID("CameraRd");
-            cmdBuffer.GetTemporaryRT(texID, Screen.width, Screen.height, 32);
-            cmdBuffer.DrawMesh(quad, Matrix4x4.identity, stencilRenderer, 0, 0);
-            cmdBuffer.Blit(BuiltinRenderTextureType.CameraTarget, texID);
+            cmdBuffer.name = "Camera Stencil Mask";
+
+            // Je prends une texture temporaire(MyCameraRd) qui est liée à la propriété de mon shader.
+            int MyCameraRdID = Shader.PropertyToID("MyCameraRd");
+            cmdBuffer.GetTemporaryRT(MyCameraRdID, -1, -1, 0, FilterMode.Bilinear);
+            // je blit la cameraTarget dans cette MyCameraRd.
+                // donc texID deviens la renderTarget
+            cmdBuffer.Blit(BuiltinRenderTextureType.CameraTarget, MyCameraRdID);
+                // la renderTarget devient CameraTarget
+            cmdBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
+            cmdBuffer.ClearRenderTarget(false, true, Color.black);
+                // je draw dans MyCameraRd dans  MyCameraRd qui est de nouveau la renderTarget
+            cmdBuffer.DrawMesh(quadPerso, Matrix4x4.identity, stencilRenderer, 0, 0);
+                // je draw de renderTarget vers CameraRD avec le tempBuffer Comme texture.
             GetComponent<Camera>().AddCommandBuffer(CameraEvent.BeforeImageEffects, cmdBuffer);
         }
-        /*
-         Algo : 
-         
-            Je veux récupérer la texture de cameraTarget ? (= ce que la camera a déjà rendu.)
-            Je veux afficher une partie de cette target sur un texture temporaire
-            Je veux que cette texture temporaire soit la texture à utiliser pour le reste du process
-
-            J'utilise drawMesh pour sélectionner une partie de la renderTexture de la camera. 
-            Je peux tenter de dessiner un quad custom avec le material mais meme problème. 
-         */
     }
+
 }

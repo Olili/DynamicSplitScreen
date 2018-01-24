@@ -1,7 +1,16 @@
 
 
 
-	Stencil : 
---> Remplir le stencil 
---> Utiliser une camera liée à un stencil. 
--->  
+	TaskList : 
+Chaques camera dois avoir un stencilFilter material lié à un numero. 
+Puis chaque camera va rendre direct sur l'écran. pas besoin d'intermédiaire. 
+
+Il va falloir remplir ces stencilMask.
+Quelles sont mes options. 
+	stencilSetMask
+Je peux raisonner sur 2 players et voir plus tard avec n players.
+
+Comment remplir le stencilMask avec 2 players ? 
+
+	S1 : Je cree des polygones Ayant la bonne taille pour remplir le stencilBuffer.
+	S2 : J'utilise un quad pour dessiner sur tout l'ecran avec un shader et le shader décide en fonction de la position.
