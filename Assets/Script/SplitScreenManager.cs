@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace VoronoiSplitScreen
 {
+    using Voronoi2;
     public class SplitScreenManager : MonoBehaviour
     {
         [SerializeField] GameObject[] targets;
         [SerializeField] Camera stencilCamera;
         Mesh[] polyMask;
-
         public GameObject[] Targets
         {
             get
@@ -26,6 +26,31 @@ namespace VoronoiSplitScreen
         {
             polyMask = new Mesh[2];
             //polyMask[0] = Mesh.C
+            Voronoi voronoi = new Voronoi(0.1f);
+            double[] x = new double[] { 1, Screen.width, Screen.width/2 };
+            double[] y = new double[] { 1, Screen.height, Screen.height / 2 };
+            List<GraphEdge> edges = voronoi.generateVoronoi(x, y, 0, Screen.width, 0, Screen.height);
+
+            for (int i = 0; i < edges.Count;i++)
+            {
+                Debug.Log(edges[i]);
+            }
+        }
+
+        public void CreateQuadsFromEdges(List<GraphEdge> edges)
+        {
+
+        }
+        public void AddBorderEdges(List<GraphEdge> edges)
+        {
+            GraphEdge up = new GraphEdge { x1 = 0, x2 = Screen.width, y1 = 0, y2 = 0 };
+            GraphEdge down = new GraphEdge { x1 = 0, x2 = Screen.width, y1 = Screen.height, y2 = Screen.height };
+            GraphEdge left = new GraphEdge { x1 = 0, x2 = 0, y1 = 0, y2 = Screen.height };
+            GraphEdge right = new GraphEdge { x1 = Screen.width, x2 = Screen.width, y1 = 0, y2 = Screen.height };
+
+            // cut + give neighbour
+
+
         }
 
         public void ComputeStencilPolyMask()
@@ -33,8 +58,13 @@ namespace VoronoiSplitScreen
             Debug.Assert(Targets.Length == 2, "Must have 2 target");
             Vector3 playerToPlayer = targets[1].transform.position - targets[0].transform.position;
 
+            Vector3 perpPlayerToPlayer = new Vector3(-playerToPlayer.y, playerToPlayer.x, playerToPlayer.z);
+            float angle = Vector3.Angle(perpPlayerToPlayer, Vector3.up);
+            float cutScreenLength = Screen.height / Mathf.Cos(angle);
 
+            //Vector3 centerBeetweenPlayer = 
         }
+        
         public void Update()
         {
             ComputeStencilPolyMask();
