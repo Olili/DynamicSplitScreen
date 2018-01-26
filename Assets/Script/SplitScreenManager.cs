@@ -32,41 +32,53 @@ namespace VoronoiSplitScreen
         }
         public Vector3[] GetSquizedPlayerPosOnScreen()
         {
-            float farthestDist = 0;
-            int farthestTargetID = 0;
+            //float farthestDist = 0;
+            //int farthestTargetID = 0;
 
-            for (int i = 0; i < targets.Length; i++)
-            {
-                if (farthestDist < targets[i].transform.position.magnitude)
-                {
-                    farthestDist = targets[i].transform.position.magnitude;
-                    farthestTargetID = i;
-                }
-            }
+            //for (int i = 0; i < targets.Length; i++)
+            //{
+            //    if (farthestDist < targets[i].transform.position.magnitude)
+            //    {
+            //        farthestDist = targets[i].transform.position.magnitude;
+            //        farthestTargetID = i;
+            //    }
+            //}
             Vector3[] playerResizePos = new Vector3[targets.Length];
-            Vector3 farthestPlayerScreenPosition = targets[farthestTargetID].transform.position;
-            farthestPlayerScreenPosition.z = 0;
-            farthestPlayerScreenPosition = Camera.main.WorldToScreenPoint(farthestPlayerScreenPosition);
+            //Vector3 farthestPlayerScreenPosition = targets[farthestTargetID].transform.position;
+            //farthestPlayerScreenPosition.z = 0;
+            //farthestPlayerScreenPosition = Camera.main.WorldToScreenPoint(farthestPlayerScreenPosition);
 
-            if (farthestPlayerScreenPosition.magnitude < (Screen.height))
+            //if (farthestPlayerScreenPosition.magnitude < (Screen.height))
+            //{
+            //    for (int i = 0; i < playerResizePos.Length; i++)
+            //    {
+            //        playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
+            //        playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]);
+            //    }
+            //}
+            //else
+            //{
+            //    float div = farthestPlayerScreenPosition.magnitude / (Screen.height);
+            //    for (int i = 0; i < playerResizePos.Length; i++)
+            //    {
+            //        playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
+            //        playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]) / div;
+            //    }
+            //}
+            for (int i = 0; i < playerResizePos.Length; i++)
             {
-                for (int i = 0; i < playerResizePos.Length; i++)
-                {
-                    playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
-                    playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]);
-                }
-            }
-            else
-            {
-                float div = farthestPlayerScreenPosition.magnitude / (Screen.height);
-                for (int i = 0; i < playerResizePos.Length; i++)
-                {
-                    playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
-                    playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]) / div;
-                }
+                playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
+                playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]);
+                if (playerResizePos[i].x > Screen.width)
+                    playerResizePos[i].x = Screen.width;
+                if (playerResizePos[i].y > Screen.height)
+                    playerResizePos[i].y = Screen.height;
+                if (playerResizePos[i].x < 0)
+                    playerResizePos[i].x = 0;
+                if (playerResizePos[i].y < 0)
+                    playerResizePos[i].y = 0;
             }
 
-            
             return playerResizePos;
         }
         public void ResizeStencilPolygoneMesh()
