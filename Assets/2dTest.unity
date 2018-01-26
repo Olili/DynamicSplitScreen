@@ -123,7 +123,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &46058744
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -367,6 +367,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &350517414 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1073287785142960, guid: 16447ec67a095cc409aba5c6475bf294,
+    type: 2}
+  m_PrefabInternal: {fileID: 758426312}
 --- !u!1 &633250890
 GameObject:
   m_ObjectHideFlags: 0
@@ -558,6 +563,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: targets.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4731845018198164, guid: a31e31f195303274ebd2f567d223824b, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -590,6 +600,21 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: debugMat
+      value: 
+      objectReference: {fileID: 2100000, guid: cd4dc2f9be79dcd4880d051fe9619b8a, type: 2}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: targets.Array.data[0]
+      value: 
+      objectReference: {fileID: 2122465007}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: targets.Array.data[1]
+      value: 
+      objectReference: {fileID: 350517414}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a31e31f195303274ebd2f567d223824b, type: 2}
   m_IsPrefabParent: 0
@@ -773,3 +798,8 @@ MonoBehaviour:
   id: 0
   checkStencil: {fileID: 0}
   classicMat: {fileID: 0}
+--- !u!1 &2122465007 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1930234622408566, guid: 16447ec67a095cc409aba5c6475bf294,
+    type: 2}
+  m_PrefabInternal: {fileID: 758426312}
