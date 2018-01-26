@@ -117,10 +117,21 @@ namespace Voronoi2
 	{
 		public double x1, y1, x2, y2;
 		public int site1, site2;
-	}
-	
-	// للترتيب
-	public class SiteSorterYX : IComparer<Site>
+
+        public override string ToString()
+        {
+
+            return "GaphEdge :" + "\n" +
+                    "x1 : " + x1 + " y1 :" + y1 + "\n" +
+                    "x2 : " + x2 + " y2 :" + y2 + "\n" +
+                    "site1 : " + site1 + " site2 : " + site2 + "\n" +
+                    "---------------------------------------";
+        }
+
+    }
+
+    // للترتيب
+    public class SiteSorterYX : IComparer<Site>
 	{
 		public int Compare ( Site p1, Site p2 )
 		{
