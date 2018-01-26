@@ -14,3 +14,37 @@ Comment remplir le stencilMask avec 2 players ?
 
 	S1 : Je cree des polygones Ayant la bonne taille pour remplir le stencilBuffer.
 	S2 : J'utilise un quad pour dessiner sur tout l'ecran avec un shader et le shader décide en fonction de la position.
+
+
+
+	Passer de Voronoi au Polygone :
+--> Voronoi sort des edges. 
+S1 
+--> j'ajoute les edges manquants pour créer mes polygones. 
+--> Je selectionne les edges définissant un player. 
+--> Je cree une liste de vertex à partir de ces edges
+--> J'ordonne la liste de vertex
+--> Je convertis ma liste de vertex en polygone
+S2 
+--> j'ajoute les edges manquants pour créer mes polygones. 
+--> Je selectionne les edges définissant un player. 
+--> Je récupère tous les vertex d'une zone. 
+--> J'ordonne la liste de vertex
+--> je triangule par rapport à ce centre. 
+--> J'ai ainsi converis en polygones.
+S3 
+--> Je Récupère tous les vertex d'un site
+	--> SI je peut boucle mon polygone c'est finit. 
+--> Je récupère tous les points manquants. 
+--> Je trie les points
+--> je construit le polygone
+
+
+	Nouvelles tâches : 
+--> Gérer la transformation des positions des player. 
+
+
+
+
+
+

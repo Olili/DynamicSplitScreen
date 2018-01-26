@@ -604,7 +604,7 @@ Prefab:
         type: 2}
       propertyPath: debugMat
       value: 
-      objectReference: {fileID: 2100000, guid: cd4dc2f9be79dcd4880d051fe9619b8a, type: 2}
+      objectReference: {fileID: 2100000, guid: 905e365a34dd85c429f4ee480d43d1ce, type: 2}
     - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
         type: 2}
       propertyPath: targets.Array.data[0]
