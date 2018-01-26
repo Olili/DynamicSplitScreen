@@ -9,7 +9,8 @@ namespace VoronoiSplitScreen
     {
         [SerializeField] GameObject[] targets;
         [SerializeField] Camera stencilCamera;
-        Mesh[] polyMask;
+        [SerializeField] Material debugMat;
+        List <Mesh> polyMaskList;
         public GameObject[] Targets
         {
             get
@@ -22,87 +23,110 @@ namespace VoronoiSplitScreen
                 targets = value;
             }
         }
+        public void Awake()
+        {
+            polyMaskList = new List<Mesh>();
+        }
         public void Start()
         {
-            polyMask = new Mesh[2];
-            //polyMask[0] = Mesh.C
+        }
+        public Vector3[] GetSquizedPlayerPosOnScreen()
+        {
+            float farthestDist = 0;
+            int farthestTargetID = 0;
+
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (farthestDist < targets[i].transform.position.magnitude)
+                {
+                    farthestDist = targets[i].transform.position.magnitude;
+                    farthestTargetID = i;
+                }
+            }
+            Vector3[] playerResizePos = new Vector3[targets.Length];
+            Vector3 farthestPlayerScreenPosition = targets[farthestTargetID].transform.position;
+            farthestPlayerScreenPosition.z = 0;
+            farthestPlayerScreenPosition = Camera.main.WorldToScreenPoint(farthestPlayerScreenPosition);
+
+            if (farthestPlayerScreenPosition.magnitude < (Screen.height))
+            {
+                for (int i = 0; i < playerResizePos.Length; i++)
+                {
+                    playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
+                    playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]);
+                }
+            }
+            else
+            {
+                float div = farthestPlayerScreenPosition.magnitude / (Screen.height);
+                for (int i = 0; i < playerResizePos.Length; i++)
+                {
+                    playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
+                    playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]) / div;
+                }
+            }
+
+            
+            return playerResizePos;
+        }
+        public void ResizeStencilPolygoneMesh()
+        {
             Voronoi voronoi = new Voronoi(0.1f);
-            double[] x = new double[] { 1, Screen.width, Screen.width/2 };
-            double[] y = new double[] { 1, Screen.height, Screen.height / 2 };
+
+            double[] x = new double[targets.Length];
+            double[] y = new double[targets.Length];
+
+            Vector3[] specialSitePos = GetSquizedPlayerPosOnScreen();
+
+          
+            for (int i = 0; i < specialSitePos.Length; i++)
+            {
+                Debug.Assert(specialSitePos[i].x < Screen.width && specialSitePos[i].y < Screen.height,"Error with playerPos");
+                x[i] = specialSitePos[i].x;
+                y[i] = specialSitePos[i].y;
+            }
             List<GraphEdge> edges = voronoi.generateVoronoi(x, y, 0, Screen.width, 0, Screen.height);
 
-            for (int i = 0; i < edges.Count;i++)
-            {
-                Debug.Log(edges[i]);
-            }
-        }
+            //for (int i = 0; i < edges.Count; i++)
+            //{
+            //    Debug.Log(edges[i]);
+            //}
+            Vector3[] sitePosList = new Vector3[x.Length];
+            for (int i = 0; i < sitePosList.Length;i++)
+                sitePosList[i] = new Vector3((float)x[i],(float) y[i], 0);
 
-        public void CreateQuadsFromEdges(List<GraphEdge> edges)
-        {
-
-        }
-        public void AddBorderEdges(List<GraphEdge> edges)
-        {
-            GraphEdge up = new GraphEdge { x1 = 0, x2 = Screen.width, y1 = 0, y2 = 0 };
-            GraphEdge down = new GraphEdge { x1 = 0, x2 = Screen.width, y1 = Screen.height, y2 = Screen.height };
-            GraphEdge left = new GraphEdge { x1 = 0, x2 = 0, y1 = 0, y2 = Screen.height };
-            GraphEdge right = new GraphEdge { x1 = Screen.width, x2 = Screen.width, y1 = 0, y2 = Screen.height };
-
-            // cut + give neighbour
-
+            polyMaskList.Clear();
+            for (int i = 0; i < sitePosList.Length; i++)
+                polyMaskList.Add(MeshHelper.GetPolygon(i, edges, sitePosList));
 
         }
+       
 
-        public void ComputeStencilPolyMask()
-        {
-            Debug.Assert(Targets.Length == 2, "Must have 2 target");
-            Vector3 playerToPlayer = targets[1].transform.position - targets[0].transform.position;
+        //public void ComputeStencilPolyMask()
+        //{
+        //    Debug.Assert(Targets.Length == 2, "Must have 2 target");
+        //    Vector3 playerToPlayer = targets[1].transform.position - targets[0].transform.position;
 
-            Vector3 perpPlayerToPlayer = new Vector3(-playerToPlayer.y, playerToPlayer.x, playerToPlayer.z);
-            float angle = Vector3.Angle(perpPlayerToPlayer, Vector3.up);
-            float cutScreenLength = Screen.height / Mathf.Cos(angle);
+        //    Vector3 perpPlayerToPlayer = new Vector3(-playerToPlayer.y, playerToPlayer.x, playerToPlayer.z);
+        //    float angle = Vector3.Angle(perpPlayerToPlayer, Vector3.up);
+        //    float cutScreenLength = Screen.height / Mathf.Cos(angle);
 
-            //Vector3 centerBeetweenPlayer = 
-        }
+        //    //Vector3 centerBeetweenPlayer = 
+        //}
         
         public void Update()
         {
-            ComputeStencilPolyMask();
+            ResizeStencilPolygoneMesh();
+            for (int i= 0; i < polyMaskList.Count;i++)
+            {
+                Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0);
+            }
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+            }
         }
     }
 
-    static class MeshHelper
-    {
-        public static Mesh GetQuad()
-        {
-            var vertices = new[]
-            {
-                new Vector3(-0.5f, -0.5f, 0f),
-                new Vector3(0.5f,  0.5f, 0f),
-                new Vector3(0.5f, -0.5f, 0f),
-                new Vector3(-0.5f,  0.5f, 0f)
-            };
-
-            var uvs = new[]
-            {
-                new Vector2(0f, 0f),
-                new Vector2(1f, 1f),
-                new Vector2(1f, 0f),
-                new Vector2(0f, 1f)
-            };
-
-            var indices = new[] { 0, 1, 2, 1, 0, 3 };
-
-            Mesh quad = new Mesh
-            {
-                vertices = vertices,
-                uv = uvs,
-                triangles = indices
-            };
-            quad.RecalculateNormals();
-            quad.RecalculateBounds();
-            return quad;
-        }
-    }
+    
 }
 
