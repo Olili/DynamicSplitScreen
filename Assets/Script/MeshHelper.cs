@@ -62,7 +62,8 @@ namespace VoronoiSplitScreen
 
             Vector3[] vertices = new Vector3[sitePolyVertices2D.Length];
             for (int i = 0; i < vertices.Length; i++)
-                vertices[i] = (new Vector3(sitePolyVertices2D[i].x, sitePolyVertices2D[i].y));
+                vertices[i] = (new Vector3((sitePolyVertices2D[i].x - Screen.width / 2) / Screen.width,
+                                            (sitePolyVertices2D[i].y - Screen.height / 2) / Screen.height));
 
 
             Mesh polygone = new Mesh();
@@ -91,44 +92,24 @@ namespace VoronoiSplitScreen
             //{
             //    Debug.Log(sitePolyVertices[i]);
             //}
-            // On Ordonne les vertices  : 
-
-
-
             return sitePolyVertices;
         }
+
         static Vector3[] SortSiteVertices(List<Vector3> polyVertices)
         {
+            // je pose les vertex déjà liés. 
+            // j'ajoute les vertex sur une meme ligne.
+            Vector3[] sortedPolyVertices = new Vector3[polyVertices.Count];
+
+
             // je commence sur un vertex arbitraire
             // je récupère le plus proche. 
             // Je récupère son plus proche différent des autres et ainsi de suite 
-            Vector3[] sortedPolyVertices = new Vector3[polyVertices.Count];
-            Vector3 curVertex = polyVertices[0];
-            sortedPolyVertices[0] = curVertex;
-            polyVertices.Remove(curVertex);
-            while (polyVertices.Count >0)
-            {
-                int closestId = 0;
-                float shortest = float.MaxValue;
-                for (int i = 0; i < polyVertices.Count; i++)
-                {
-                    float distance = Vector3.Distance(curVertex, polyVertices[i]);
-                    if (distance < shortest)
-                    {
-                        closestId = i;
-                        shortest = distance;
-                    }
-                }
-                sortedPolyVertices[closestId] = polyVertices[closestId];
-                sortedPolyVertices[closestId].x /= Screen.width;
-                sortedPolyVertices[closestId].y /= Screen.height;
-
-                curVertex = polyVertices[closestId];
-                polyVertices.Remove(polyVertices[closestId]);
-            }
+            for (int i = 0; i < polyVertices.Count; i++)
+                sortedPolyVertices[i] = polyVertices[i];
             return sortedPolyVertices;
-
         }
+
         static void AddGraphVerticesToSiteVertices(int curSite, List<GraphEdge> listEdges,List<Vector3> siteVertices)
         {
             Debug.Assert(siteVertices != null, "list must not be null");
@@ -148,6 +129,7 @@ namespace VoronoiSplitScreen
         static void AddBorderVerticeToSiteVertices(int curSite, List<Vector3> borderVertices, Vector3[] sitePosList, List<Vector3> siteVertices)
         {
             Debug.Assert(siteVertices != null, "list must not be null");
+            List<Vector3> tempBorderVertices =new List<Vector3>();
             for (int i = 0; i < borderVertices.Count; i++)
             {
                 float shortestDistance = float.MaxValue;
@@ -162,7 +144,22 @@ namespace VoronoiSplitScreen
                     }
                 }
                 if (shortestSiteId == curSite)
-                    siteVertices.Add(borderVertices[i]);
+                {
+                    //siteVertices.Add(borderVertices[i]);
+                    tempBorderVertices.Add(borderVertices[i]);
+                }
+            }
+            int nbGraph = siteVertices.Count;
+            int nbBorderAdded = 0;
+            for (int i = 0; nbBorderAdded < tempBorderVertices.Count; i = (i + 1) % tempBorderVertices.Count) 
+            {
+                if ((siteVertices[nbGraph + nbBorderAdded - 1].x == tempBorderVertices[i].x ||
+                    siteVertices[nbGraph + nbBorderAdded - 1].y == tempBorderVertices[i].y) &&
+                    !siteVertices.Contains(tempBorderVertices[i]))
+                {
+                    nbBorderAdded++;
+                    siteVertices.Add(tempBorderVertices[i]);
+                }
             }
         }
         public static void CreatePolygoneFromVertices(Vector3 vertices)
