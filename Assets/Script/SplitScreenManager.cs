@@ -70,9 +70,9 @@ namespace VoronoiSplitScreen
                 playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
                 playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]);
                 if (playerResizePos[i].x > Screen.width)
-                    playerResizePos[i].x = Screen.width;
+                    playerResizePos[i].x = Screen.width-1;
                 if (playerResizePos[i].y > Screen.height)
-                    playerResizePos[i].y = Screen.height;
+                    playerResizePos[i].y = Screen.height-1;
                 if (playerResizePos[i].x < 0)
                     playerResizePos[i].x = 0;
                 if (playerResizePos[i].y < 0)
@@ -90,7 +90,6 @@ namespace VoronoiSplitScreen
 
             Vector3[] specialSitePos = GetSquizedPlayerPosOnScreen();
 
-          
             for (int i = 0; i < specialSitePos.Length; i++)
             {
                 Debug.Assert(specialSitePos[i].x < Screen.width && specialSitePos[i].y < Screen.height,"Error with playerPos");
@@ -103,13 +102,9 @@ namespace VoronoiSplitScreen
             //{
             //    Debug.Log(edges[i]);
             //}
-            Vector3[] sitePosList = new Vector3[x.Length];
-            for (int i = 0; i < sitePosList.Length;i++)
-                sitePosList[i] = new Vector3((float)x[i],(float) y[i], 0);
-
             polyMaskList.Clear();
-            for (int i = 0; i < sitePosList.Length; i++)
-                polyMaskList.Add(MeshHelper.GetPolygon(i, edges, sitePosList));
+            for (int i = 0; i < specialSitePos.Length; i++)
+                polyMaskList.Add(MeshHelper.GetPolygon(i, edges, specialSitePos));
 
         }
        
@@ -131,7 +126,13 @@ namespace VoronoiSplitScreen
             ResizeStencilPolygoneMesh();
             for (int i= 0; i < polyMaskList.Count;i++)
             {
-                Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0);
+                //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0);
+                MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
+                propertyBlock.SetColor("color", i == 0 ? Color.cyan : Color.magenta);
+                Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0, Camera.main, 0, propertyBlock);
+                //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0);
+
+
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
