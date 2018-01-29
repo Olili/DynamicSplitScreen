@@ -10,6 +10,7 @@ namespace VoronoiSplitScreen
         [SerializeField] GameObject[] targets;
         [SerializeField] Camera stencilCamera;
         [SerializeField] Material debugMat;
+        Color[] debugColor = new Color[6] { Color.magenta, Color.red, Color.white, Color.black, Color.cyan,Color.grey};
         List <Mesh> polyMaskList;
         public GameObject[] Targets
         {
@@ -29,6 +30,18 @@ namespace VoronoiSplitScreen
         }
         public void Start()
         {
+        }
+        public void ComputeWorldBounds()
+        {
+            Bounds worldBounds = new Bounds();
+            Vector2 playerAveragePosition = Vector2.zero;
+            for (int i = 0;i < targets.Length;i++)
+            {
+                playerAveragePosition += new Vector2(targets[i].transform.position.x, targets[i].transform.position.z);
+            }
+            worldBounds.center = playerAveragePosition /= targets.Length;
+            for (int i = 0; i < targets.Length; i++)
+                worldBounds.Encapsulate(targets[i].transform.position);
         }
         public Vector3[] GetSquizedPlayerPosOnScreen()
         {
@@ -128,7 +141,7 @@ namespace VoronoiSplitScreen
             {
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0);
                 MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
-                propertyBlock.SetColor("color", i == 0 ? Color.cyan : Color.magenta);
+                propertyBlock.SetColor("color", debugColor[i]);
                 Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0, Camera.main, 0, propertyBlock);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0);
 
