@@ -47,7 +47,7 @@ SubShader {
 			{
 				Vertex2Pixel o;
 				o.pos = i.vertex; //Projection du modèle 3D, cette ligne est obligatoire
-				//o.pos.xy *= 2;
+				o.pos.xy *= 2;
 		        o.uv=i.texcoord ; //UV de la texture
 				o.uv.y = -o.uv.y + 1;
 		      	

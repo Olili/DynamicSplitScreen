@@ -47,9 +47,9 @@ namespace VoronoiSplitScreen
         --> Je convertis ma liste de vertex en polygone
         --> j'affiche le polygone avec le material requis. 
         */
-        public static Mesh GetPolygon(int site, List<GraphEdge> listEdges, Vector3[] sitePosList)
+        public static Mesh GetPolygon(int site, List<GraphEdge> listEdges, Vector3[] sitePosList, Bounds worldBounds)
         {
-            Vector3[] sortedvertices = GetPolyVertices(site, sitePosList, listEdges);
+            Vector3[] sortedvertices = GetPolyVertices(site, sitePosList, listEdges, worldBounds);
 
             // Convert Vertices in 2d
             Vector2[] sitePolyVertices2D = new Vector2[sortedvertices.Length];
@@ -61,8 +61,10 @@ namespace VoronoiSplitScreen
 
             Vector3[] vertices = new Vector3[sitePolyVertices2D.Length];
             for (int i = 0; i < vertices.Length; i++)
-                vertices[i] = (new Vector3((sitePolyVertices2D[i].x - Screen.width / 2) / Screen.width,
-                                            (Screen.height - sitePolyVertices2D[i].y - Screen.height / 2) / Screen.height)) * 2;
+                //vertices[i] = (new Vector3((sitePolyVertices2D[i].x - Screen.width / 2) / Screen.width,
+                //                            (Screen.height - sitePolyVertices2D[i].y - Screen.height / 2) / Screen.height)) * 2;
+                vertices[i] = (new Vector3((sitePolyVertices2D[i].x) / (worldBounds.extents.x ),
+                                                (sitePolyVertices2D[i].y) / (worldBounds.extents.y)))*0.5f;
 
             Mesh polygone = new Mesh();
             polygone.vertices = vertices;
@@ -79,15 +81,15 @@ namespace VoronoiSplitScreen
                 -->E02 Si non je cherche parmis les bords qui lui appartiennt un bord qui est lié à ce truc.
             --> stop lorsque je retourne a la première arrivée.
         */
-        static Vector3[] GetPolyVertices(int curSite, Vector3[] sitePosList, List<GraphEdge> listEdges)
+        static Vector3[] GetPolyVertices(int curSite, Vector3[] sitePosList, List<GraphEdge> listEdges,Bounds bounds)
         {
             // creation des borderVertices
             List<Vector3> borderVertices = new List<Vector3>
             {
-                new Vector3(0, 0, 0),
-                new Vector3(Screen.width,0 , 0),
-                new Vector3(0, Screen.height, 0),
-                new Vector3(Screen.width, Screen.height, 0),
+                new Vector3(-bounds.extents.x, -bounds.extents.y, 0),
+                new Vector3(-bounds.extents.x,bounds.extents.y , 0),
+                new Vector3(bounds.extents.x, -bounds.extents.y, 0),
+                new Vector3(bounds.extents.x, bounds.extents.y, 0),
             };
 
             // récupération des border vertex appartenant à la zone. 

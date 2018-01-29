@@ -31,53 +31,28 @@ namespace VoronoiSplitScreen
         public void Start()
         {
         }
-        public void ComputeWorldBounds()
+        public void ComputeWorldBounds(out Bounds worldBounds, out Vector3[] voronoiSitePos)
         {
-            Bounds worldBounds = new Bounds();
+            worldBounds = new Bounds();
+            voronoiSitePos = new Vector3[targets.Length];
             Vector2 playerAveragePosition = Vector2.zero;
             for (int i = 0;i < targets.Length;i++)
             {
-                playerAveragePosition += new Vector2(targets[i].transform.position.x, targets[i].transform.position.z);
+                playerAveragePosition += new Vector2(targets[i].transform.position.x, targets[i].transform.position.y);
             }
             worldBounds.center = playerAveragePosition /= targets.Length;
             for (int i = 0; i < targets.Length; i++)
-                worldBounds.Encapsulate(targets[i].transform.position);
+            {
+                voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);
+                voronoiSitePos[i].z = 0;
+                worldBounds.Encapsulate(voronoiSitePos[i]*1.01f);
+            }
         }
         public Vector3[] GetSquizedPlayerPosOnScreen()
         {
-            //float farthestDist = 0;
-            //int farthestTargetID = 0;
-
-            //for (int i = 0; i < targets.Length; i++)
-            //{
-            //    if (farthestDist < targets[i].transform.position.magnitude)
-            //    {
-            //        farthestDist = targets[i].transform.position.magnitude;
-            //        farthestTargetID = i;
-            //    }
-            //}
+          
             Vector3[] playerResizePos = new Vector3[targets.Length];
-            //Vector3 farthestPlayerScreenPosition = targets[farthestTargetID].transform.position;
-            //farthestPlayerScreenPosition.z = 0;
-            //farthestPlayerScreenPosition = Camera.main.WorldToScreenPoint(farthestPlayerScreenPosition);
-
-            //if (farthestPlayerScreenPosition.magnitude < (Screen.height))
-            //{
-            //    for (int i = 0; i < playerResizePos.Length; i++)
-            //    {
-            //        playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
-            //        playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]);
-            //    }
-            //}
-            //else
-            //{
-            //    float div = farthestPlayerScreenPosition.magnitude / (Screen.height);
-            //    for (int i = 0; i < playerResizePos.Length; i++)
-            //    {
-            //        playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
-            //        playerResizePos[i] = Camera.main.WorldToScreenPoint(playerResizePos[i]) / div;
-            //    }
-            //}
+            
             for (int i = 0; i < playerResizePos.Length; i++)
             {
                 playerResizePos[i] = new Vector3(targets[i].transform.position.x, targets[i].transform.position.y, 0);
@@ -97,27 +72,31 @@ namespace VoronoiSplitScreen
         public void ResizeStencilPolygoneMesh()
         {
             Voronoi voronoi = new Voronoi(0.1f);
+            Bounds worldBounds ;
 
             double[] x = new double[targets.Length];
             double[] y = new double[targets.Length];
 
-            Vector3[] specialSitePos = GetSquizedPlayerPosOnScreen();
+            Vector3[] specialSitePos;// = GetSquizedPlayerPosOnScreen();
+
+            ComputeWorldBounds(out worldBounds, out specialSitePos);
 
             for (int i = 0; i < specialSitePos.Length; i++)
             {
-                Debug.Assert(specialSitePos[i].x < Screen.width && specialSitePos[i].y < Screen.height,"Error with playerPos");
+                //Debug.Assert(specialSitePos[i].x < Screen.width && specialSitePos[i].y < Screen.height,"Error with playerPos");
                 x[i] = specialSitePos[i].x;
                 y[i] = specialSitePos[i].y;
             }
-            List<GraphEdge> edges = voronoi.generateVoronoi(x, y, 0, Screen.width, 0, Screen.height);
-
-            //for (int i = 0; i < edges.Count; i++)
-            //{
-            //    Debug.Log(edges[i]);
-            //}
+            List<GraphEdge> edges = voronoi.generateVoronoi(x, y, -worldBounds.extents.x, worldBounds.extents.x,
+                                                                  -worldBounds.extents.y, worldBounds.extents.y);
+            if (edges == null || edges.Count <= 0)
+            {
+                Debug.Log("Stuff");
+            }
+            Debug.Assert(edges != null && edges.Count > 0, "Error with Voronoi edge List");
             polyMaskList.Clear();
             for (int i = 0; i < specialSitePos.Length; i++)
-                polyMaskList.Add(MeshHelper.GetPolygon(i, edges, specialSitePos));
+                polyMaskList.Add(MeshHelper.GetPolygon(i, edges, specialSitePos, worldBounds));
 
         }
        

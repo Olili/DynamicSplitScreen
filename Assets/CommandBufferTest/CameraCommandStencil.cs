@@ -33,30 +33,30 @@ public class CameraCommandStencil : MonoBehaviour {
 
     void Start () {
 
-        List<Vector3> vertices = new List<Vector3>();
-        unityQuad.GetVertices(vertices);
-        foreach (Vector3 vertex in vertices)
-        {
-            Debug.Log("v : "+vertex);
-        }
-        List<Vector2> Uvs = new List<Vector2>();
-        unityQuad.GetUVs(0,Uvs);
-        foreach (Vector2 uv in Uvs)
-        {
-            Debug.Log("Uv :" + uv);
-        }
-        int[] indices = unityQuad.GetIndices(0);
-        foreach (int id in indices)
-        {
-            Debug.Log("id :" + id);
-        }
-        int[] triangles = unityQuad.GetTriangles(0);
-        foreach (int triangle in triangles)
-        {
-            Debug.Log("triangle :" + triangle);
-        }
-        unityQuad.RecalculateNormals();
-        unityQuad.RecalculateBounds();
+        //List<Vector3> vertices = new List<Vector3>();
+        //unityQuad.GetVertices(vertices);
+        //foreach (Vector3 vertex in vertices)
+        //{
+        //    Debug.Log("v : "+vertex);
+        //}
+        //List<Vector2> Uvs = new List<Vector2>();
+        //unityQuad.GetUVs(0,Uvs);
+        //foreach (Vector2 uv in Uvs)
+        //{
+        //    Debug.Log("Uv :" + uv);
+        //}
+        //int[] indices = unityQuad.GetIndices(0);
+        //foreach (int id in indices)
+        //{
+        //    Debug.Log("id :" + id);
+        //}
+        //int[] triangles = unityQuad.GetTriangles(0);
+        //foreach (int triangle in triangles)
+        //{
+        //    Debug.Log("triangle :" + triangle);
+        //}
+        //unityQuad.RecalculateNormals();
+        //unityQuad.RecalculateBounds();
 
     }
     void OnEnable()
