@@ -253,7 +253,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -466,7 +466,7 @@ Prefab:
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
       propertyPath: playerColors.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4336272535383664, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
       propertyPath: m_LocalPosition.x
@@ -523,12 +523,12 @@ Prefab:
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
       propertyPath: playerColors.Array.data[2].g
-      value: 0.39756596
+      value: 0.6827586
       objectReference: {fileID: 0}
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
       propertyPath: playerColors.Array.data[2].b
-      value: 0.007352948
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
@@ -543,7 +543,7 @@ Prefab:
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
       propertyPath: nbPlayers
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4316933196797646, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
       propertyPath: m_LocalPosition.z
@@ -552,6 +552,10 @@ Prefab:
     - target: {fileID: 4670830169170926, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
       propertyPath: m_LocalPosition.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4316933196797646, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 1.49
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
@@ -566,7 +570,7 @@ Prefab:
     - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
         type: 2}
       propertyPath: targets.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4731845018198164, guid: a31e31f195303274ebd2f567d223824b, type: 2}
       propertyPath: m_LocalPosition.x
@@ -615,6 +619,11 @@ Prefab:
       propertyPath: targets.Array.data[1]
       value: 
       objectReference: {fileID: 350517414}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: targets.Array.data[2]
+      value: 
+      objectReference: {fileID: 1930926600}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a31e31f195303274ebd2f567d223824b, type: 2}
   m_IsPrefabParent: 0
@@ -798,6 +807,11 @@ MonoBehaviour:
   id: 0
   checkStencil: {fileID: 0}
   classicMat: {fileID: 0}
+--- !u!1 &1930926600 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1869465597590110, guid: 16447ec67a095cc409aba5c6475bf294,
+    type: 2}
+  m_PrefabInternal: {fileID: 758426312}
 --- !u!1 &2122465007 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 1930234622408566, guid: 16447ec67a095cc409aba5c6475bf294,

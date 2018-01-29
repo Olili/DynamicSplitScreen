@@ -76,7 +76,6 @@ namespace VoronoiSplitScreen
             polygone.RecalculateBounds();
             return polygone;
         }
-
         /*
             Refacto organisation mesh :
             --> 1er arrivée est l'arrivée du premier edge.
@@ -121,13 +120,12 @@ namespace VoronoiSplitScreen
                 if (listEdges[i].x1 == listEdges[i].x2 && listEdges[i].y1 == listEdges[i].y2)
                     continue;
                 if ((listEdges[i].site1 == curSite || listEdges[i].site2 == curSite) &&
-                    templistEdges.Find(edge => edge.x1 == listEdges[i].x1 && edge.x2 == listEdges[i].x2) == null)
+                    templistEdges.Find(edge =>  edge.x1 == listEdges[i].x1 && edge.x2 == listEdges[i].x2
+                                        &&      edge.y1 == listEdges[i].y1 && edge.y2 == listEdges[i].y2) == null)
                     templistEdges.Add(listEdges[i]);
             }
 
             // organisation des vertices dans l'ordre
-            //int size = 0;
-            //for (int i = 0; i < templistEdges.Count; i++)
             List<Vector3> sortedvertices = new List<Vector3>();
             Vector3 firstPoint = new Vector3((float)templistEdges[0].x1, (float)templistEdges[0].y1, 0);
             Vector3 curPoint = firstPoint;
@@ -150,7 +148,6 @@ namespace VoronoiSplitScreen
                         curPoint = edgeVertex2;
                     if (nextPointFound)
                     {
-                        //templistEdges.Remove(templistEdges[j]);
                         break;
                     }
                 }
@@ -172,7 +169,6 @@ namespace VoronoiSplitScreen
                 }
                 if (!nextPointFound)
                 {
-                    //Debug.LogError("Error in polyVertice ordering site : " + curSite);
                     break;
                 }
                 else
@@ -188,8 +184,6 @@ namespace VoronoiSplitScreen
                         }
                     }
                 }
-                //if (tempBorderVertices.Count == 0 && templistEdges.Count == 1)
-                //    break;
             }
             while (curPoint != firstPoint);
 
