@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: AsupprMat
-  m_Shader: {fileID: 4800000, guid: 0ceb2f8bb9d581b4ca98d2cadcce56d0, type: 3}
+  m_Name: StencilDebugDrawer
+  m_Shader: {fileID: 4800000, guid: 6c93e998fadbc9e42af42f6efd190c4c, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -69,6 +69,7 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
+    - _StencilMask: 0
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:

@@ -62,7 +62,7 @@ namespace VoronoiSplitScreen
             Vector3[] vertices = new Vector3[sitePolyVertices2D.Length];
             for (int i = 0; i < vertices.Length; i++)
                 vertices[i] = (new Vector3((sitePolyVertices2D[i].x) / (worldBounds.extents.x),
-                                                (sitePolyVertices2D[i].y * -1) / (worldBounds.extents.y))) *0.5f;
+                                                (sitePolyVertices2D[i].y * -1) / (worldBounds.extents.y)));
 
             Mesh polygone = new Mesh();
             polygone.vertices = vertices;
@@ -144,7 +144,6 @@ namespace VoronoiSplitScreen
                     else if (nextPointFound = (edgeVertex2 == curPoint && !sortedvertices.Contains(edgeVertex1)) &&
                            (sortedvertices.Find(edge => edge == edgeVertex1) == Vector3.zero))
                         curPoint = edgeVertex1;
-                    
                     if (nextPointFound)
                         break;
                 }

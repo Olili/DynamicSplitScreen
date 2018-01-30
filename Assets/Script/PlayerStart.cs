@@ -12,7 +12,7 @@ public class PlayerStart : MonoBehaviour {
     GameObject[] playerRef;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         playerRef = new GameObject[nbPlayers];
         for (int i = 0; i < nbPlayers;i++)
         {

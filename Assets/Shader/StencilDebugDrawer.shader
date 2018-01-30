@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Stencils/StencilDrawer"
+Shader "Stencils/StencilDebugDrawer"
 {
 	Properties
 	{
@@ -15,22 +15,13 @@ Shader "Stencils/StencilDrawer"
 			"Queue" = "Geometry-100"
 		}
 		Cull off
-		ColorMask 0
-		ZWrite off
-		Stencil
-		{
-			Ref[_StencilMask]
-			Comp always
-			Pass replace
-		}
-
 		Pass
 		{
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			int _StencilMask;
 
+			float4 color;
 			struct appdata
 			{
 				float4 vertex : POSITION;
@@ -50,8 +41,7 @@ Shader "Stencils/StencilDrawer"
 
 			half4 frag(v2f i) : COLOR
 			{
-				return half4(_StencilMask,0,_StencilMask,1);
-				//return half4(1,0,1,1);
+				return half4(color);
 			}
 			ENDCG
 		}
