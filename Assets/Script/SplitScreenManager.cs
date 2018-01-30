@@ -83,10 +83,10 @@ namespace VoronoiSplitScreen
             polyMaskList = new List<Mesh>();
             splitCameraList = new List<SplitScreenCamera>();
             stencilDrawerTab = new Material[3];
-            stencilDrawerTab[1] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            stencilDrawerTab[1].SetFloat("_StencilMask", 0);
             stencilDrawerTab[0] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            stencilDrawerTab[0].SetFloat("_StencilMask", 1);
+            stencilDrawerTab[0].SetFloat("_StencilMask", 0);
+            stencilDrawerTab[1] = new Material(Shader.Find("Stencils/StencilDrawer"));
+            stencilDrawerTab[1].SetFloat("_StencilMask", 1);
 
 
             //for (int i = 0; i < stencilDrawerTab.Length;i++ )
@@ -98,11 +98,17 @@ namespace VoronoiSplitScreen
         }
         public void Start()
         {
-            SplitScreenCamera splitCamera = gameObject.GetComponentInChildren<SplitScreenCamera>();
-            if (splitCamera != null)
+            //SplitScreenCamera splitCamera = gameObject.GetComponentInChildren<SplitScreenCamera>();
+            //if (splitCamera != null)
+            //{
+            //    splitCameraList.Add(splitCamera);
+            //    splitCamera.Init(targets[0].transform);
+            //}
+            for (int i = 0; i < transform.childCount;i++)
             {
+                SplitScreenCamera splitCamera = transform.GetChild(i).GetComponentInChildren<SplitScreenCamera>();
                 splitCameraList.Add(splitCamera);
-                splitCamera.Init(targets[0].transform);
+                splitCamera.Init(targets[i].transform,i);
             }
         }
 

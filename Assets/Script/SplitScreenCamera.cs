@@ -18,6 +18,7 @@ namespace VoronoiSplitScreen
         private CommandBuffer cmdBuffer;
         private Material stencilRenderer;
 
+
         #region getterSetters
         public int ID
         {
@@ -32,7 +33,10 @@ namespace VoronoiSplitScreen
             if (quadPerso == null)
                 quadPerso = MeshHelper.GetQuad();
             if (stencilRenderer== null)
+            {
                 stencilRenderer = new Material(Shader.Find("Hidden/StencilRenderer"));
+                stencilRenderer.SetFloat("_StencilMask", id);
+            }
 
             if (cmdBuffer == null)
             {
@@ -63,9 +67,10 @@ namespace VoronoiSplitScreen
         #endregion
 
 
-        public void Init(Transform _primaryTarget)
+        public void Init(Transform _primaryTarget, int _Id)
         {
             camera = GetComponent<Camera>();
+            id = _Id;
             primaryTarget = _primaryTarget;
             OnStart();
         }
