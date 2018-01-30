@@ -36,7 +36,7 @@ namespace VoronoiSplitScreen
             worldBounds = new Bounds();
             voronoiSitePos = new Vector3[targets.Length];
             Vector2 playerAveragePosition = Vector2.zero;
-            for (int i = 0;i < targets.Length;i++)
+            for (int i = 0; i < targets.Length; i++)
             {
                 playerAveragePosition += new Vector2(targets[i].transform.position.x, targets[i].transform.position.y);
             }
@@ -45,7 +45,19 @@ namespace VoronoiSplitScreen
             {
                 voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);
                 voronoiSitePos[i].z = 0;
-                worldBounds.Encapsulate(voronoiSitePos[i]*1.01f);
+                Vector2 newExtents = worldBounds.extents;
+                if (newExtents.x < Mathf.Abs(voronoiSitePos[i].x))
+                {
+                    newExtents.x = Mathf.Abs(voronoiSitePos[i].x + 0.1f);
+                    newExtents.y = newExtents.x * Screen.height / Screen.width;
+                }
+                if (newExtents.y < Mathf.Abs(voronoiSitePos[i].y))
+                {
+                    newExtents.y = Mathf.Abs(voronoiSitePos[i].y + 0.1f);
+                    newExtents.x = newExtents.y * Screen.width / Screen.height;
+                }
+                worldBounds.extents = newExtents;
+                //worldBounds.Encapsulate(voronoiSitePos[i]*1.01f);
             }
         }
         public Vector3[] GetSquizedPlayerPosOnScreen()
@@ -80,7 +92,7 @@ namespace VoronoiSplitScreen
             Vector3[] specialSitePos;// = GetSquizedPlayerPosOnScreen();
 
             ComputeWorldBounds(out worldBounds, out specialSitePos);
-
+            boundsGizmo = worldBounds;
             for (int i = 0; i < specialSitePos.Length; i++)
             {
                 //Debug.Assert(specialSitePos[i].x < Screen.width && specialSitePos[i].y < Screen.height,"Error with playerPos");
@@ -91,7 +103,8 @@ namespace VoronoiSplitScreen
                                                                   -worldBounds.extents.y, worldBounds.extents.y);
             if (edges == null || edges.Count <= 0)
             {
-                Debug.Log("Stuff");
+                Debug.Log("Error with Voronoi edge List");
+                return;
             }
             Debug.Assert(edges != null && edges.Count > 0, "Error with Voronoi edge List");
             polyMaskList.Clear();
@@ -128,6 +141,21 @@ namespace VoronoiSplitScreen
             }
             if (Input.GetKeyDown(KeyCode.Space))
             {
+            }
+        }
+        Bounds boundsGizmo;
+        public void OnDrawGizmos()
+        {
+            if (boundsGizmo!=null)
+            {
+                Gizmos.color = Color.grey;
+                Gizmos.DrawLine(boundsGizmo.min, boundsGizmo.min + new Vector3(boundsGizmo.size.x, 0, 0));
+                Gizmos.DrawLine(boundsGizmo.max, boundsGizmo.max - new Vector3(boundsGizmo.size.x, 0, 0));
+
+                Gizmos.DrawLine(boundsGizmo.min, boundsGizmo.min + new Vector3(0, boundsGizmo.size.y, 0));
+                Gizmos.DrawLine(boundsGizmo.max, boundsGizmo.max - new Vector3(0, boundsGizmo.size.y, 0));
+
+                Gizmos.DrawSphere(boundsGizmo.center, 0.2f);
             }
         }
     }
