@@ -61,10 +61,8 @@ namespace VoronoiSplitScreen
 
             Vector3[] vertices = new Vector3[sitePolyVertices2D.Length];
             for (int i = 0; i < vertices.Length; i++)
-                //vertices[i] = (new Vector3((sitePolyVertices2D[i].x - Screen.width / 2) / Screen.width,
-                //                            (Screen.height - sitePolyVertices2D[i].y - Screen.height / 2) / Screen.height)) * 2;
-                vertices[i] = (new Vector3((sitePolyVertices2D[i].x) / (worldBounds.extents.x ),
-                                                (sitePolyVertices2D[i].y) / (worldBounds.extents.y)))*0.5f;
+                vertices[i] = (new Vector3((sitePolyVertices2D[i].x) / (worldBounds.extents.x),
+                                                (sitePolyVertices2D[i].y * -1) / (worldBounds.extents.y))) *0.5f;
 
             Mesh polygone = new Mesh();
             polygone.vertices = vertices;
@@ -73,6 +71,7 @@ namespace VoronoiSplitScreen
             polygone.RecalculateBounds();
             return polygone;
         }
+
         /*
             Refacto organisation mesh :
             --> 1er arrivée est l'arrivée du premier edge.
@@ -121,7 +120,7 @@ namespace VoronoiSplitScreen
                                         && edge.y1 == listEdges[i].y1 && edge.y2 == listEdges[i].y2) == null)
                     templistEdges.Add(listEdges[i]);
             }
-
+            Debug.Assert(templistEdges.Count > 0, "Error with neighbour Voronoi edge");
             // organisation des vertices dans l'ordre
             List<Vector3> sortedvertices = new List<Vector3>();
             Vector3 firstPoint = new Vector3((float)templistEdges[0].x1, (float)templistEdges[0].y1, 0);
@@ -130,32 +129,32 @@ namespace VoronoiSplitScreen
             int curID = 1;
             do
             {
+
+               
+                           
+
                 bool nextPointFound = false;
                 for (int j = 0; j < templistEdges.Count; j++)
                 {
                     Vector3 edgeVertex1 = new Vector3((float)templistEdges[j].x1, (float)templistEdges[j].y1, 0);
                     Vector3 edgeVertex2 = new Vector3((float)templistEdges[j].x2, (float)templistEdges[j].y2, 0);
-                    if (nextPointFound = (edgeVertex1 == curPoint && !sortedvertices.Contains(edgeVertex2)))
+                    if (nextPointFound = (edgeVertex1 == curPoint && !sortedvertices.Contains(edgeVertex2)) &&
+                           (sortedvertices.Find(edge => edge == edgeVertex2) == Vector3.zero))
                         curPoint = edgeVertex2;
-                    else if (nextPointFound = (edgeVertex2 == curPoint && !sortedvertices.Contains(edgeVertex1)))
+                    else if (nextPointFound = (edgeVertex2 == curPoint && !sortedvertices.Contains(edgeVertex1)) &&
+                           (sortedvertices.Find(edge => edge == edgeVertex1) == Vector3.zero))
                         curPoint = edgeVertex1;
-                    else if (nextPointFound = ((edgeVertex1.x == curPoint.x || edgeVertex1.y == curPoint.y) && !sortedvertices.Contains(edgeVertex1)))
-                        curPoint = edgeVertex1;
-                    else if (nextPointFound = ((edgeVertex2.x == curPoint.x || edgeVertex2.y == curPoint.y) && !sortedvertices.Contains(edgeVertex2)))
-                        curPoint = edgeVertex2;
+                    
                     if (nextPointFound)
-                    {
                         break;
-                    }
                 }
-
 
                 if (!nextPointFound)
                 {
                     for (int j = 0; j < tempBorderVertices.Count; j++)
                     {
-                        if ((curPoint.x == tempBorderVertices[j].x ||
-                            curPoint.y == tempBorderVertices[j].y))
+                        if (Mathf.Approximately(curPoint.x, tempBorderVertices[j].x) ||
+                            Mathf.Approximately(curPoint.y, tempBorderVertices[j].y))
                         {
                             nextPointFound = true;
                             curPoint = tempBorderVertices[j];
@@ -165,6 +164,23 @@ namespace VoronoiSplitScreen
                     }
                 }
                 if (!nextPointFound)
+                {
+                    for (int j = 0; j < templistEdges.Count; j++)
+                    {
+                        Vector3 edgeVertex1 = new Vector3((float)templistEdges[j].x1, (float)templistEdges[j].y1, 0);
+                        Vector3 edgeVertex2 = new Vector3((float)templistEdges[j].x2, (float)templistEdges[j].y2, 0);
+
+                        if (nextPointFound = ((edgeVertex1.x == curPoint.x || edgeVertex1.y == curPoint.y) && !sortedvertices.Contains(edgeVertex1)))
+                            curPoint = edgeVertex1;
+                        else if (nextPointFound = ((edgeVertex2.x == curPoint.x || edgeVertex2.y == curPoint.y) && !sortedvertices.Contains(edgeVertex2)))
+                            curPoint = edgeVertex2;
+                        if (nextPointFound)
+                            break;
+                    }
+                }
+
+
+                    if (!nextPointFound)
                 {
                     break;
                 }
