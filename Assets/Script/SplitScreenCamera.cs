@@ -15,9 +15,11 @@ namespace VoronoiSplitScreen
 
             // Command Buffer
         Mesh quadPerso;
-        private CommandBuffer cmdBuffer;
+        private CommandBuffer cmdBufferStencil;
+        private CommandBuffer cmdBufferLastCamera;
         private Material stencilRenderer;
-
+        static private RenderTexture lastCameraRender = null;
+        static private RenderTargetIdentifier lastCameraRenderId;
 
         #region getterSetters
         public int ID
@@ -38,31 +40,51 @@ namespace VoronoiSplitScreen
                 stencilRenderer.SetFloat("_StencilMask", id);
             }
 
-            if (cmdBuffer == null)
+            if (lastCameraRender == null)
             {
-                cmdBuffer = new CommandBuffer();
-                cmdBuffer.name = "Camera Stencil Mask";
+                lastCameraRender = new RenderTexture(Screen.width, Screen.height, 16);
+                lastCameraRenderId = new RenderTargetIdentifier(lastCameraRender);
+            }
+            // Second command buffer test : 
+            if (cmdBufferLastCamera == null)
+            {
+                cmdBufferLastCamera = new CommandBuffer();
+                cmdBufferLastCamera.name = "cmdBufferLastCamera";
+                cmdBufferLastCamera.Blit(BuiltinRenderTextureType.CurrentActive, lastCameraRenderId);
+                camera.AddCommandBuffer(CameraEvent.AfterEverything, cmdBufferLastCamera);
+            }
+            if (cmdBufferStencil == null)
+            {
+                cmdBufferStencil = new CommandBuffer();
+                cmdBufferStencil.name = "Camera Stencil Mask";
 
                 // Je prends une texture temporaire(MyCameraRd) qui est liée à la propriété de mon shader.
                 int MyCameraRdID = Shader.PropertyToID("MyCameraRd");
-                cmdBuffer.GetTemporaryRT(MyCameraRdID, -1, -1, 0, FilterMode.Bilinear);
+                cmdBufferStencil.GetTemporaryRT(MyCameraRdID, -1, -1, 0, FilterMode.Bilinear);
                 // je blit la cameraTarget dans cette MyCameraRd.
                 // donc texID deviens la renderTarget
-                cmdBuffer.Blit(BuiltinRenderTextureType.CameraTarget, MyCameraRdID);
+                cmdBufferStencil.Blit(BuiltinRenderTextureType.CameraTarget, MyCameraRdID);
                 // la renderTarget devient CameraTarget
-                cmdBuffer.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-                cmdBuffer.ClearRenderTarget(false, true, Color.black);
+                cmdBufferStencil.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
+                if (id!=0)
+                    cmdBufferStencil.Blit(lastCameraRenderId, BuiltinRenderTextureType.CameraTarget);
+
+                //cmdBufferStencil.ClearRenderTarget(false, true, Color.black);
                 // je draw dans MyCameraRd dans  MyCameraRd qui est de nouveau la renderTarget
-                cmdBuffer.DrawMesh(quadPerso, Matrix4x4.identity, stencilRenderer, 0, 0);
+                cmdBufferStencil.DrawMesh(quadPerso, Matrix4x4.identity, stencilRenderer, 0, 0);
+
                 // je draw de renderTarget vers CameraRD avec le tempBuffer Comme texture.
-                camera.AddCommandBuffer(CameraEvent.BeforeImageEffects, cmdBuffer);
+                camera.AddCommandBuffer(CameraEvent.BeforeImageEffects, cmdBufferStencil);
+
+                  
             }
+            
         }
         void OnDisable()
         {
-            if (cmdBuffer != null)
-                camera.RemoveCommandBuffer(CameraEvent.BeforeImageEffects, cmdBuffer);
-            cmdBuffer = null;
+            if (cmdBufferStencil != null)
+                camera.RemoveCommandBuffer(CameraEvent.BeforeImageEffects, cmdBufferStencil);
+            cmdBufferStencil = null;
         }
         #endregion
 

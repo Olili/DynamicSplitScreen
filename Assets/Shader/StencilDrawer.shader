@@ -50,8 +50,7 @@ Shader "Stencils/StencilDrawer"
 
 			half4 frag(v2f i) : COLOR
 			{
-				return half4(_StencilMask,0,_StencilMask,1);
-				//return half4(1,0,1,1);
+				return half4(1,0,1,1);
 			}
 			ENDCG
 		}

@@ -83,17 +83,17 @@ namespace VoronoiSplitScreen
             polyMaskList = new List<Mesh>();
             splitCameraList = new List<SplitScreenCamera>();
             stencilDrawerTab = new Material[3];
-            stencilDrawerTab[0] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            stencilDrawerTab[0].SetFloat("_StencilMask", 0);
-            stencilDrawerTab[1] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            stencilDrawerTab[1].SetFloat("_StencilMask", 1);
+            //stencilDrawerTab[0] = new Material(Shader.Find("Stencils/StencilDrawer"));
+            //stencilDrawerTab[0].SetFloat("_StencilMask", 0);
+            //stencilDrawerTab[1] = new Material(Shader.Find("Stencils/StencilDrawer"));
+            //stencilDrawerTab[1].SetFloat("_StencilMask", 1);
 
 
-            //for (int i = 0; i < stencilDrawerTab.Length;i++ )
-            //{
-            //    stencilDrawerTab[i] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            //    stencilDrawerTab[i].SetFloat("_StencilMask", Mathf.Pow(2,i));
-            //}
+            for (int i = 0; i < stencilDrawerTab.Length; i++)
+            {
+                stencilDrawerTab[i] = new Material(Shader.Find("Stencils/StencilDrawer"));
+                stencilDrawerTab[i].SetFloat("_StencilMask", Mathf.Pow(2, i));
+            }
 
         }
         public void Start()
@@ -149,6 +149,7 @@ namespace VoronoiSplitScreen
                 Gizmos.DrawLine(boundsGizmo.min, boundsGizmo.min + new Vector3(0, boundsGizmo.size.y, 0));
                 Gizmos.DrawLine(boundsGizmo.max, boundsGizmo.max - new Vector3(0, boundsGizmo.size.y, 0));
 
+                Gizmos.color = Color.magenta;
                 Gizmos.DrawSphere(boundsGizmo.center, 0.2f);
             }
         }
