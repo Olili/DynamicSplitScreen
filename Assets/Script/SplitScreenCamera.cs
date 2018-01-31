@@ -66,10 +66,10 @@ namespace VoronoiSplitScreen
                 cmdBufferStencil.Blit(BuiltinRenderTextureType.CameraTarget, MyCameraRdID);
                 // la renderTarget devient CameraTarget
                 cmdBufferStencil.SetRenderTarget(BuiltinRenderTextureType.CameraTarget);
-                if (id!=0)
+                if (id == 0)
+                    cmdBufferStencil.ClearRenderTarget(false, true, Color.black);
+                else
                     cmdBufferStencil.Blit(lastCameraRenderId, BuiltinRenderTextureType.CameraTarget);
-
-                //cmdBufferStencil.ClearRenderTarget(false, true, Color.black);
                 // je draw dans MyCameraRd dans  MyCameraRd qui est de nouveau la renderTarget
                 cmdBufferStencil.DrawMesh(quadPerso, Matrix4x4.identity, stencilRenderer, 0, 0);
 
@@ -111,6 +111,7 @@ namespace VoronoiSplitScreen
         }
         public void Split()
         {
+
         }
         public void Follow()
         {
