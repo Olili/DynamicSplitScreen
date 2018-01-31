@@ -17,6 +17,7 @@ Shader "Stencils/StencilDrawer"
 		Cull off
 		ColorMask 0
 		ZWrite off
+		ZTest Always
 		Stencil
 		{
 			Ref[_StencilMask]

@@ -44,6 +44,10 @@ S3
 --> Gérer la transformation des positions des player. 
 
 
+	Comment gérer la séparation des écran : 
+--> mieux comprendre comment les player sont centrés à l'écran. 
+--> Séparer les player lorsqu'il s'écartent. 
+--> Rassembler les player lorsqu'il sont collé. 
 
 
 
