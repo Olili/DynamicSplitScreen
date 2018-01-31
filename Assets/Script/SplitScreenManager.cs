@@ -7,12 +7,12 @@ namespace VoronoiSplitScreen
     using Voronoi2;
     public class SplitScreenManager : MonoBehaviour
     {
+        static SplitScreenManager singleton;
         List<SplitScreenCamera> splitCameraList;
         [SerializeField] GameObject[] targets;
         [SerializeField] Material debugMat;
         [SerializeField] Material stencilDrawer;
         [SerializeField] Material[] stencilDrawerTab;
-        [SerializeField] Rect deadZone;
         Color[] debugColor = new Color[6] { Color.white, Color.black,Color.magenta, Color.red,  Color.cyan,Color.grey};
         List <Mesh> polyMaskList;
         public GameObject[] Targets
@@ -21,11 +21,22 @@ namespace VoronoiSplitScreen
 
             set{targets = value;}
         }
-        
+
+        static public SplitScreenManager Singleton
+        {
+            get
+            {
+                if (singleton == null)
+                    Debug.LogError("SplitScreenManager Missing");
+                return singleton;
+            }
+        }
+
         public void ComputeWorldBounds(out Bounds worldBounds, out Vector3[] voronoiSitePos)
         {
             worldBounds = new Bounds();
             voronoiSitePos = new Vector3[targets.Length];
+            Vector2 newExtents = Vector2.zero;
             Vector2 playerAveragePosition = Vector2.zero;
             for (int i = 0; i < targets.Length; i++)
             {
@@ -36,19 +47,21 @@ namespace VoronoiSplitScreen
             {
                 voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);
                 voronoiSitePos[i].z = 0;
-                Vector2 newExtents = worldBounds.extents;
+                newExtents = worldBounds.extents;
                 if (newExtents.x < Mathf.Abs(voronoiSitePos[i].x))
                 {
-                    newExtents.x = Mathf.Abs(voronoiSitePos[i].x + 0.1f);
+                    newExtents.x = Mathf.Abs(voronoiSitePos[i].x);
                     newExtents.y = newExtents.x * Screen.currentResolution.height / Screen.currentResolution.width;
                 }
                 if (newExtents.y < Mathf.Abs(voronoiSitePos[i].y))
                 {
-                    newExtents.y = Mathf.Abs(voronoiSitePos[i].y + 0.1f);
+                    newExtents.y = Mathf.Abs(voronoiSitePos[i].y);
                     newExtents.x = newExtents.y * Screen.currentResolution.width / Screen.currentResolution.height;
                 }
+                    // Min camera Size for player.
                 worldBounds.extents = newExtents;
             }
+            worldBounds.extents = newExtents;
         }
         public void ResizeStencilPolygoneMesh(Bounds worldBounds ,Vector3[] targetVoronoiPos)
         {
@@ -76,11 +89,15 @@ namespace VoronoiSplitScreen
             polyMaskList.Clear();
             for (int i = 0; i < targetVoronoiPos.Length; i++)
                 polyMaskList.Add(MeshHelper.GetPolygon(i, edges, targetVoronoiPos, worldBounds));
-
+        }
+        public void Split(SplitScreenCamera splitOne,int idOne,int idTwo)
+        {
+            
         }
 
         public void Awake()
         {
+            singleton = this;
             polyMaskList = new List<Mesh>();
             splitCameraList = new List<SplitScreenCamera>();
             stencilDrawerTab = new Material[3];

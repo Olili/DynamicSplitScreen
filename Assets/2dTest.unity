@@ -654,6 +654,21 @@ Prefab:
       propertyPath: m_AllowMSAA
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: deadZone.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: deadZone.width
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114929641412446900, guid: a31e31f195303274ebd2f567d223824b,
+        type: 2}
+      propertyPath: deadZone.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a31e31f195303274ebd2f567d223824b, type: 2}
   m_IsPrefabParent: 0

@@ -52,3 +52,9 @@ S3
 
 
 
+	-- Clean : 
+--> do real singleton for SplitScreenManager
+
+
+
+

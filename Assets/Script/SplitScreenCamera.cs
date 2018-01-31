@@ -5,11 +5,12 @@ using UnityEngine.Rendering;
 
 namespace VoronoiSplitScreen
 {
+    public enum CameraMode {singleTarget,multipleTarget }
     public class SplitScreenCamera : MonoBehaviour
     {
         new Camera camera;
         Transform primaryTarget;
-        List <Transform> targetInFrustrum;
+        List <Transform> targetInDeadZone = new List<Transform>();
         public Vector2 targetVoronoiScreenPos;
         int id;
 
@@ -50,7 +51,9 @@ namespace VoronoiSplitScreen
             {
                 cmdBufferLastCamera = new CommandBuffer();
                 cmdBufferLastCamera.name = "cmdBufferLastCamera";
+                RenderTexture active = RenderTexture.active;
                 cmdBufferLastCamera.Blit(BuiltinRenderTextureType.CurrentActive, lastCameraRenderId);
+                cmdBufferLastCamera.SetRenderTarget(active);
                 camera.AddCommandBuffer(CameraEvent.AfterEverything, cmdBufferLastCamera);
             }
             if (cmdBufferStencil == null)
@@ -98,30 +101,67 @@ namespace VoronoiSplitScreen
         }
         public void UpdateTargets()
         {
-            Vector3 primaryTargetScreenPoint = camera.WorldToViewportPoint(primaryTarget.position);
-            bool onScreen = primaryTargetScreenPoint.z > 0 && primaryTargetScreenPoint.x > 0 
-                && primaryTargetScreenPoint.x < 1 && primaryTargetScreenPoint.y > 0 && primaryTargetScreenPoint.y < 1;
-
-            for (int i = 0; i < targetInFrustrum.Count;i++)
+            GameObject[] target = SplitScreenManager.Singleton.Targets;
+            for (int i = 0; i < target.Length; i++)
             {
+                Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
+                //viewPortPos = (viewPortPos *2)- Vector3.one;
+
+                bool onScreen = viewPortPos.x > 0.25f && viewPortPos.y > 0.25f
+                && viewPortPos.x < 0.75f && viewPortPos.y < 0.75f;
+                if (onScreen)
+                {
+                    if (!targetInDeadZone.Contains(target[i].transform))
+                    {
+                        targetInDeadZone.Add(target[i].transform);
+                        Merge();
+                    }
+                }
+                else
+                {
+                    if (targetInDeadZone.Contains(target[i].transform))
+                    {
+                        targetInDeadZone.Remove(target[i].transform);
+                        Split();
+                    }
+                }
+
             }
+            // je parcours les joueurs.
+            // j'ajoute les joueurs qui sont dans ma deadZone. 
+            // Si un joueur n'est plus dans ma deadZone. (=> stuff
+            // Si un joueur est ajouté à ma deadZone (=>suff
         }
         public void Merge()
         {
+                // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
         }
         public void Split()
         {
-
+                // On passe à 2 camera chacun ayant leur target.
         }
-        public void Follow()
+        public void FollowOnePlayer()
         {
             Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenPos + Vector2.one) * 0.5f) - transform.position;
             Vector3 cameraPos = primaryTarget.transform.position - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         }
+        public void FollowMultiplePlayer()
+        {
+            Vector3 playerAverage = Vector3.zero;
+            for (int i = 0; i < targetInDeadZone.Count; i++)
+                playerAverage += targetInDeadZone[i].position;
+            transform.position = new Vector3(playerAverage.x, playerAverage.y, transform.position.z);
+        }
         public void Update()
         {
-            Follow();
+            UpdateTargets();
+            //FollowOnePlayer();
+            //FollowMultiplePlayer();
+            if (targetInDeadZone.Count == 1)
+                FollowOnePlayer();
+            else
+                FollowMultiplePlayer();
         }
     }
 
