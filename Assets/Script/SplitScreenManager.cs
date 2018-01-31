@@ -48,15 +48,19 @@ namespace VoronoiSplitScreen
                 voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);
                 voronoiSitePos[i].z = 0;
                 newExtents = worldBounds.extents;
+                float test = Camera.main.aspect;
+                test = 1.0f*Screen.currentResolution.width / Screen.currentResolution.height;
+                test = 1.0f * Screen.width / Screen.height;
+
                 if (newExtents.x < Mathf.Abs(voronoiSitePos[i].x))
                 {
                     newExtents.x = Mathf.Abs(voronoiSitePos[i].x);
-                    newExtents.y = newExtents.x * Screen.currentResolution.height / Screen.currentResolution.width;
+                    newExtents.y = newExtents.x /Camera.main.aspect;
                 }
                 if (newExtents.y < Mathf.Abs(voronoiSitePos[i].y))
                 {
                     newExtents.y = Mathf.Abs(voronoiSitePos[i].y);
-                    newExtents.x = newExtents.y * Screen.currentResolution.width / Screen.currentResolution.height;
+                    newExtents.x = newExtents.y * Camera.main.aspect;
                 }
                     // Min camera Size for player.
                 worldBounds.extents = newExtents;
@@ -116,17 +120,11 @@ namespace VoronoiSplitScreen
         }
         public void Start()
         {
-            //SplitScreenCamera splitCamera = gameObject.GetComponentInChildren<SplitScreenCamera>();
-            //if (splitCamera != null)
-            //{
-            //    splitCameraList.Add(splitCamera);
-            //    splitCamera.Init(targets[0].transform);
-            //}
             for (int i = 0; i < transform.childCount;i++)
             {
                 SplitScreenCamera splitCamera = transform.GetChild(i).GetComponentInChildren<SplitScreenCamera>();
-                splitCameraList.Add(splitCamera);
                 splitCamera.Init(targets[i].transform,i);
+                splitCameraList.Add(splitCamera);
             }
         }
 
@@ -139,8 +137,8 @@ namespace VoronoiSplitScreen
 
             for (int i = 0; i < splitCameraList.Count; i++)
             {
-                splitCameraList[i].targetVoronoiScreenPos.x = targetVoronoiPos[i].x / worldBounds.size.x;
-                splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / worldBounds.size.y;
+                splitCameraList[i].targetVoronoiScreenPos.x = targetVoronoiPos[i].x / worldBounds.extents.x;
+                splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / worldBounds.extents.y;
             }
 
             for (int i= 0; i < polyMaskList.Count;i++)

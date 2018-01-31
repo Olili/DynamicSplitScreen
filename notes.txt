@@ -1,0 +1,10 @@
+VoronoiSitepos :
+	= distance entre la moyenne les positions des player
+	et la position des player. (= écartement des player) 
+World bounds : 
+	= La plus grosse distance en X ou  y des player
+	Respecte le ratio de l'écran. 
+TargetVoronoi Screen pos : va de -1 à 1.
+
+playerOffset : distance entre player et camera en mètres unity.
+

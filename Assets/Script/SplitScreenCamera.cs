@@ -54,7 +54,7 @@ namespace VoronoiSplitScreen
                 RenderTexture active = RenderTexture.active;
                 cmdBufferLastCamera.Blit(BuiltinRenderTextureType.CurrentActive, lastCameraRenderId);
                 cmdBufferLastCamera.SetRenderTarget(active);
-                camera.AddCommandBuffer(CameraEvent.AfterEverything, cmdBufferLastCamera);
+                camera.AddCommandBuffer(CameraEvent.AfterImageEffects, cmdBufferLastCamera);
             }
             if (cmdBufferStencil == null)
             {
@@ -142,7 +142,8 @@ namespace VoronoiSplitScreen
         }
         public void FollowOnePlayer()
         {
-            Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenPos + Vector2.one) * 0.5f) - transform.position;
+            Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenPos*0.5f + Vector2.one) * 0.5f) - transform.position;
+            //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
             Vector3 cameraPos = primaryTarget.transform.position - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         }
@@ -155,13 +156,13 @@ namespace VoronoiSplitScreen
         }
         public void Update()
         {
-            UpdateTargets();
-            //FollowOnePlayer();
+            //UpdateTargets();
+            FollowOnePlayer();
             //FollowMultiplePlayer();
-            if (targetInDeadZone.Count == 1)
-                FollowOnePlayer();
-            else
-                FollowMultiplePlayer();
+            //if (targetInDeadZone.Count == 1)
+            //    FollowOnePlayer();
+            //else
+            //    FollowMultiplePlayer();
         }
     }
 
