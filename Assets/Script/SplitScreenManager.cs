@@ -52,8 +52,8 @@ namespace VoronoiSplitScreen
                 newExtents = worldBounds.extents;
 
                     // for testing purpose
-                float aspect = Camera.main.aspect;
-                aspect = 1.0f*Screen.currentResolution.width / Screen.currentResolution.height;
+                //float aspect = Camera.main.aspect;
+                float aspect = 1.0f*Screen.currentResolution.width / Screen.currentResolution.height;
                 aspect = 1.0f * Screen.width / Screen.height;
 
                 if (newExtents.x < Mathf.Abs(voronoiSitePos[i].x))
@@ -98,6 +98,19 @@ namespace VoronoiSplitScreen
             for (int i = 0; i < targetVoronoiPos.Length; i++)
                 polyMaskList.Add(MeshHelper.GetPolygon(i, edges, targetVoronoiPos, worldBounds));
         }
+        public SplitScreenCamera GetSplitCamera(Transform target)
+        {
+            for (int i = 0; i < splitCameraList.Count;i++)
+            {
+                if (splitCameraList[i].PrimaryTarget == target)
+                    return splitCameraList[i];
+            }
+            return null;
+        }
+        public void Merge(Transform targetOne, Transform targetTwo, SplitScreenCamera firstCam)
+        {
+            RemoveCamera(GetSplitCamera(targetTwo));
+        }
         public void Split(SplitScreenCamera splitOne,Transform targetOne, Transform targetTwo)
         {
             AddCamera(targetTwo);
@@ -110,7 +123,11 @@ namespace VoronoiSplitScreen
         }
         public void RemoveCamera(SplitScreenCamera cam)
         {
+            if (cam == null ||cam == splitCameraList[0])
+                return;
             splitCameraList.Remove(cam);
+            Destroy(cam.gameObject);
+
             for (int i = 0; i < splitCameraList.Count;i++)
                 splitCameraList[i].SetID(i);
         }
@@ -166,7 +183,8 @@ namespace VoronoiSplitScreen
                 //propertyBlock2.SetFloat("_StencilMask", i);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer, 0, Camera.main, 0, propertyBlock2);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer,0);
-                Graphics.DrawMesh(polyMaskList[i], Camera.main.transform.position+ Camera.main.transform.forward, Quaternion.identity, stencilDrawerTab[i],0,Camera.main,0);
+                Vector3 position = splitCameraList[0].transform.position + splitCameraList[0].transform.forward;
+                Graphics.DrawMesh(polyMaskList[i], position, Quaternion.identity, stencilDrawerTab[i],0, splitCameraList[0].GetComponent<Camera>(), 0);
             }
         }
         Bounds boundsGizmo;

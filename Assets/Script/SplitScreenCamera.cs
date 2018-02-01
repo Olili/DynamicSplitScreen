@@ -28,6 +28,14 @@ namespace VoronoiSplitScreen
             get { return id; }
             set { id = value; }
         }
+
+        public Transform PrimaryTarget
+        {
+            get
+            {
+                return primaryTarget;
+            }
+        }
         #endregion
 
         #region CommandBuffer
@@ -79,11 +87,14 @@ namespace VoronoiSplitScreen
             }
             
         }
-        void OnDisable()
+        void OnDestroy()
         {
             if (cmdBufferStencil != null)
                 camera.RemoveCommandBuffer(CameraEvent.BeforeImageEffects, cmdBufferStencil);
             cmdBufferStencil = null;
+            if (cmdBufferLastCamera!=null)
+                camera.RemoveCommandBuffer(CameraEvent.BeforeImageEffects, cmdBufferLastCamera);
+            cmdBufferLastCamera = null;
         }
         #endregion
 
@@ -101,6 +112,18 @@ namespace VoronoiSplitScreen
             primaryTarget = _primaryTarget;
             SetID(_Id);
             OnStart();
+            FollowOnePlayer();
+            GameObject[] target = SplitScreenManager.Singleton.Targets;
+            for (int i = 0; i < target.Length; i++)
+            {
+                Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
+                bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
+                && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
+                if (onScreen)
+                {
+                    targetInDeadZone.Add(target[i].transform);
+                }
+            }
         }
         public void UpdateTargets()
         {
@@ -116,7 +139,7 @@ namespace VoronoiSplitScreen
                     if (!targetInDeadZone.Contains(target[i].transform))
                     {
                         targetInDeadZone.Add(target[i].transform);
-                        Merge();
+                        Merge(primaryTarget, target[i].transform);
                     }
                 }
                 else
@@ -133,9 +156,10 @@ namespace VoronoiSplitScreen
             // Si un joueur n'est plus dans ma deadZone. (=> stuff
             // Si un joueur est ajouté à ma deadZone (=>suff
         }
-        public void Merge()
+        public void Merge(Transform primary, Transform secondTarget)
         {
-                // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
+            // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
+            SplitScreenManager.Singleton.Merge(primary, secondTarget, this);
         }
         public void Split(Transform secondaryTarget)
         {
@@ -165,7 +189,6 @@ namespace VoronoiSplitScreen
             else
                 FollowMultiplePlayer();
 
-            //FollowOnePlayer();
         }
     }
 
