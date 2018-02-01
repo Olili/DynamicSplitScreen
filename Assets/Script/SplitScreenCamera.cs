@@ -11,7 +11,7 @@ namespace VoronoiSplitScreen
         new Camera camera;
         Transform primaryTarget;
         [SerializeField]List <Transform> targetInDeadZone = new List<Transform>();
-        public Vector2 targetVoronoiScreenPos;
+        public Vector2 targetVoronoiScreenOffset;
         [SerializeField] int id;
 
             // Command Buffer
@@ -175,9 +175,15 @@ namespace VoronoiSplitScreen
         }
         public void FollowOnePlayer()
         {
-            Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenPos + Vector2.one) * 0.5f) - transform.position;
+            Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenOffset + Vector2.one) * 0.5f) - transform.position;
             //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
-            Vector3 cameraPos = primaryTarget.transform.position - playerOffSet;
+            Vector3 targetCenter = Vector3.zero;
+            for (int i = 0; i < targetInDeadZone.Count; i++)
+            {
+                targetCenter += targetInDeadZone[i].position;
+            }
+            targetCenter /= targetInDeadZone.Count;
+            Vector3 cameraPos = targetCenter - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         }
         public void FollowMultiplePlayer()
@@ -191,12 +197,28 @@ namespace VoronoiSplitScreen
         public void Update()
         {
             UpdateTargets();
-            if (targetInDeadZone.Count < 2)
-                FollowOnePlayer();
-            else
-                FollowMultiplePlayer();
+            //if (targetInDeadZone.Count < 2)
+            //    FollowOnePlayer();
+            //else
+            //    FollowOnePlayer();
+            FollowOnePlayer();
 
         }
+        //public void OnDrawGizmos()
+        //{
+        //    Gizmos.color = Color.green;
+        //    Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenOffset + Vector2.one) * 0.5f) - transform.position;
+        //    //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
+        //    Vector3 targetCenter = Vector3.zero;
+        //    for (int i = 0; i < targetInDeadZone.Count;i++)
+        //    {
+        //        targetCenter += targetInDeadZone[i].position;
+        //    }
+        //    targetCenter /= targetInDeadZone.Count;
+        //    Vector3 cameraPos = targetCenter - playerOffSet;
+        //    Vector3 center = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
+        //    Gizmos.DrawSphere(center, 0.5f);
+        //}
     }
 
 }

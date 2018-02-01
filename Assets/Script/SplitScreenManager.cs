@@ -166,12 +166,12 @@ namespace VoronoiSplitScreen
             {
                 if (voronoiBounds.extents != Vector3.zero)
                 {
-                    splitCameraList[i].targetVoronoiScreenPos.x = targetVoronoiPos[i].x / voronoiBounds.extents.x;
-                    splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / voronoiBounds.extents.y;
+                    splitCameraList[i].targetVoronoiScreenOffset.x = targetVoronoiPos[i].x / voronoiBounds.extents.x;
+                    splitCameraList[i].targetVoronoiScreenOffset.y = targetVoronoiPos[i].y / voronoiBounds.extents.y;
                 }
                 else
                 {
-                    splitCameraList[i].targetVoronoiScreenPos = Vector2.zero;
+                    splitCameraList[i].targetVoronoiScreenOffset = Vector2.zero;
                 }
                     
             }

@@ -1,21 +1,4 @@
-
-
-
 	TaskList : 
-Chaques camera dois avoir un stencilFilter material lié à un numero. 
-Puis chaque camera va rendre direct sur l'écran. pas besoin d'intermédiaire. 
-
-Il va falloir remplir ces stencilMask.
-Quelles sont mes options. 
-	stencilSetMask
-Je peux raisonner sur 2 players et voir plus tard avec n players.
-
-Comment remplir le stencilMask avec 2 players ? 
-
-	S1 : Je cree des polygones Ayant la bonne taille pour remplir le stencilBuffer.
-	S2 : J'utilise un quad pour dessiner sur tout l'ecran avec un shader et le shader décide en fonction de la position.
-
-
 
 	Passer de Voronoi au Polygone :
 --> Voronoi sort des edges. 
@@ -40,21 +23,69 @@ S3
 --> je construit le polygone
 
 
-	Nouvelles tâches : 
---> Gérer la transformation des positions des player. 
-
-
-	Comment gérer la séparation des écran : 
---> mieux comprendre comment les player sont centrés à l'écran. 
---> Séparer les player lorsqu'il s'écartent. 
---> Rassembler les player lorsqu'il sont collé. 
-
-
-
-
-	-- Clean : 
+	-- Clean: 
 --> do real singleton for SplitScreenManager
 --> handle Command buffer more effectivly (Image effect).
+--> Dynamic material allocation. 
+	-- Todo
+--> Effect sur VoronoïEdges.(séparation ecran)
+--> Coder un Voronoï simplifié.
+--> Coder un constructeur de mesh simplifié.
+--> remove PrimaryTarget (gérer le nan in targetDeadZone)
+
+
+	Voronoi avec plusieurs targets : 
+E0 : Imaginons 4 target dont 2 groupe de 1 et une groupe de 2.
+E1 : Une des target seule se rapproche des 2 cibles. Un merge s'opère. 
+E2 : Il ya mainenant un groupe de 3 et un groupe de 1.
+E3 : Le groupe de 3 se scinde. Il y aura 1 groupe de 2 et 1 groupe de 1 .
+E3* : Le groupe de 3 se scinde en 3 à la meme frame.
+
+E0 : J'ai 3 camera. 
+	--> C0 est positionnée au milieu de 2 joueurs. 
+		--> Soit elle est liée à une zones voronoï qui a pour centre le centre de ses joueurs. (risque de faire une cassure dans cas limite)
+			--> Soit centre de cette camera est :Moyenne des centre des player + offset de ce centre .
+		--> Soit elle est liée à 2 zones voronoï qui dessinent toutes les 2 sur la camera. 	
+			--> Soit centre de cette camera est :Moyenne des centre des player + Moyenne des voronoï offset des players.
+		
+	--> C1 et C2 sont centrée par rapport à un offset de leur players.
+E1 : Merge de 2 groupe : G0( 2 joueurs) et G1 (1 joueur)
+	--> Sur les 2 Camera, une va disparaître. 
+	--> La camera qui trigger l'event est evidemment bien placée et demande à ce qu'on détruise l'autre
+	--> La nouvella camera aura donc 3 targets. 
+E2 : J'ai 2 camera.
+	--> Similaire à E0
+E3 : Split de E0 composé de 3 joueurs. En 1 groupe de 2 et un groupe de 1
+	--> Il va falloir instancier une nouvelle camera (C1) pour le joueur qui pars.
+	--> C0 va se recentrer sur les 2 joueur restant (j'ai du mal a visualiser cela ca créer un break ?!
+	--> C1 va devoir se centrer par rapport au calcul Voronoï du nouveau joueur.
+
+
+
+
+	La notion de groupe : 
+--> un groupe est composé de : 
+	--> 1 camera. 
+	--> Plusieurs players. 
+
+
+	La structure Camera target : 
+--> Une camera a un indice
+--> elle a des cibles.
+--> elle a un centre. 
+--> Cela correspond à pls voronoi region.
+
+	Problématique particulière du split : 
+--> 2 camera doivent se replacer. 
+--> Je dois calculer les nouveaux offset des camera ( pour cela les camera doivent 
+avoir les bonnes targets.)
+
+
+
+
+
+
+
 
 
 
