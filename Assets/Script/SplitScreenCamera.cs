@@ -120,7 +120,6 @@ namespace VoronoiSplitScreen
             primaryTarget = _primaryTarget;
             SetID(_Id);
             InitCommmandBuffer();
-            FollowOnePlayer();
             GameObject[] target = SplitScreenManager.Singleton.Targets;
             for (int i = 0; i < target.Length; i++)
             {
@@ -129,8 +128,11 @@ namespace VoronoiSplitScreen
                 && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
                 if (onScreen)
                 {
-                    targetInDeadZone.Add(target[i].transform);
+                    targetInDeadZone.Add(target[i].transform); ;
                 }
+            }
+            if (targetInDeadZone.Count == 0)
+            {
             }
         }
         public void UpdateTargets()
@@ -157,7 +159,7 @@ namespace VoronoiSplitScreen
                     if (targetInDeadZone.Contains(target[i].transform) && target[i].transform != primaryTarget)
                     {
                         targetInDeadZone.Remove(target[i].transform);
-                        Split(target[i].transform);
+                        SplitScreenManager.Singleton.Split(this, target[i].transform);
                     }
                 }
             }
@@ -170,11 +172,6 @@ namespace VoronoiSplitScreen
         {
             // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
             SplitScreenManager.Singleton.Merge(primary, secondTarget, this);
-        }
-        public void Split(Transform secondaryTarget)
-        {
-            // On passe à 2 camera chacun ayant leur target.
-            SplitScreenManager.Singleton.Split(this, primaryTarget, secondaryTarget);
         }
         public void FollowOnePlayer()
         {

@@ -46,7 +46,6 @@ namespace VoronoiSplitScreen
             }
             worldBounds.center = playerAveragePosition /= targets.Length;
 
-
             for (int i = 0; i < splitCameraList.Count; i++)
             {
                 for (int j = 0; j < splitCameraList[i].TargetInDeadZone.Count; j++)
@@ -57,7 +56,7 @@ namespace VoronoiSplitScreen
                 //voronoiSitePos[i] = (targets[i].transform.position );
                 voronoiSitePos[i].z = 0;
                 newExtents = worldBounds.extents;
-
+             
                     // for testing purpose
                 //float aspect = Camera.main.aspect;
                 float aspect = 1.0f*Screen.currentResolution.width / Screen.currentResolution.height;
@@ -81,13 +80,10 @@ namespace VoronoiSplitScreen
         public void ResizeStencilPolygoneMesh(Bounds worldBounds ,Vector3[] targetVoronoiPos)
         {
             Voronoi voronoi = new Voronoi(0.1f);
-            
 
             double[] x = new double[targets.Length];
             double[] y = new double[targets.Length];
 
-
-            
             boundsGizmo = worldBounds;
             for (int i = 0; i < targetVoronoiPos.Length; i++)
             {
@@ -118,19 +114,29 @@ namespace VoronoiSplitScreen
         {
             RemoveCamera(GetSplitCamera(targetTwo));
         }
-        public void Split(SplitScreenCamera splitOne,Transform targetOne, Transform targetTwo)
+        public void Split(SplitScreenCamera splitOne,Transform exitingTarget)
         {
-            AddCamera(targetTwo);
+            SplitScreenCamera newCamera =  AddCamera(exitingTarget, splitOne.transform.position);
+            newCamera.TargetInDeadZone.Add(exitingTarget);
+            Bounds worldBounds;
+            Vector3[] targetVoronoiPos;
+            ComputeWorldBounds(out worldBounds, out targetVoronoiPos);
+            UpdateCameraTargetOffset(targetVoronoiPos, worldBounds);
+            // J'ajoute une nouvelle camera. 
+            // je lui donne les targetsInFrustrum necessaire. 
+            // je reRemplis la targetInFrustrum pour la camera1.
+            // je calcule son offset. (est-ce vraiment necessaire
         }
-        public void AddCamera(Transform primarTarget)
+        public SplitScreenCamera AddCamera(Transform primaryTarget,Vector3 position)
         {
-            SplitScreenCamera newCamera = Instantiate(splitCameraModel, splitCameraList[0].transform.position, splitCameraList[0].transform.rotation, transform);
-            newCamera.Init(primarTarget, splitCameraList.Count);
+            SplitScreenCamera newCamera = Instantiate(splitCameraModel, position, splitCameraList[0].transform.rotation, transform);
             splitCameraList.Add(newCamera);
+            newCamera.Init(primaryTarget, splitCameraList.Count-1);
+            return newCamera;
         }
         public void RemoveCamera(SplitScreenCamera cam)
         {
-            if (cam == null ||cam == splitCameraList[0])
+            if (cam == null || cam == splitCameraList[0])
                 return;
             splitCameraList.Remove(cam);
             Destroy(cam.gameObject);
@@ -144,13 +150,7 @@ namespace VoronoiSplitScreen
             singleton = this;
             polyMaskList = new List<Mesh>();
             splitCameraList = new List<SplitScreenCamera>();
-            stencilDrawerTab = new Material[3];
-            //stencilDrawerTab[0] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            //stencilDrawerTab[0].SetFloat("_StencilMask", 0);
-            //stencilDrawerTab[1] = new Material(Shader.Find("Stencils/StencilDrawer"));
-            //stencilDrawerTab[1].SetFloat("_StencilMask", 1);
-
-
+            stencilDrawerTab = new Material[4];
             for (int i = 0; i < stencilDrawerTab.Length; i++)
             {
                 stencilDrawerTab[i] = new Material(Shader.Find("Stencils/StencilDrawer"));
@@ -158,16 +158,33 @@ namespace VoronoiSplitScreen
             }
 
         }
+       
+        public void UpdateCameraTargetOffset(Vector3[] targetVoronoiPos,Bounds voronoiBounds)
+        {
+            
+            for (int i = 0; i < splitCameraList.Count; i++)
+            {
+                if (voronoiBounds.extents != Vector3.zero)
+                {
+                    splitCameraList[i].targetVoronoiScreenPos.x = targetVoronoiPos[i].x / voronoiBounds.extents.x;
+                    splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / voronoiBounds.extents.y;
+                }
+                else
+                {
+                    splitCameraList[i].targetVoronoiScreenPos = Vector2.zero;
+                }
+                    
+            }
+        }
         public void Start()
         {
-            for (int i = 0; i < transform.childCount;i++)
+            for (int i = 0; i < transform.childCount; i++)
             {
                 SplitScreenCamera splitCamera = transform.GetChild(i).GetComponentInChildren<SplitScreenCamera>();
-                splitCamera.Init(targets[i].transform,i);
+                splitCamera.Init(targets[i].transform, i);
                 splitCameraList.Add(splitCamera);
             }
         }
-
         public void Update()
         {
             Bounds worldBounds;
@@ -177,11 +194,8 @@ namespace VoronoiSplitScreen
             if (splitCameraList.Count > 1)
                 ResizeStencilPolygoneMesh(worldBounds, targetVoronoiPos);
 
-            for (int i = 0; i < splitCameraList.Count; i++)
-            {
-                splitCameraList[i].targetVoronoiScreenPos.x = targetVoronoiPos[i].x / worldBounds.extents.x;
-                splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / worldBounds.extents.y;
-            }
+            UpdateCameraTargetOffset(targetVoronoiPos, worldBounds);
+
             if (splitCameraList.Count > 1)
                 for (int i= 0; i <splitCameraList.Count;i++)
                 {
@@ -189,6 +203,8 @@ namespace VoronoiSplitScreen
                     Graphics.DrawMesh(polyMaskList[i], position, Quaternion.identity, stencilDrawerTab[i],0, splitCameraList[0].GetComponent<Camera>(), 0);
                 }
         }
+
+
         Bounds boundsGizmo;
         public void OnDrawGizmos()
         {
