@@ -48,24 +48,26 @@ namespace VoronoiSplitScreen
                 voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);
                 voronoiSitePos[i].z = 0;
                 newExtents = worldBounds.extents;
-                float test = Camera.main.aspect;
-                test = 1.0f*Screen.currentResolution.width / Screen.currentResolution.height;
-                test = 1.0f * Screen.width / Screen.height;
+
+                    // for testing purpose
+                float aspect = Camera.main.aspect;
+                aspect = 1.0f*Screen.currentResolution.width / Screen.currentResolution.height;
+                aspect = 1.0f * Screen.width / Screen.height;
 
                 if (newExtents.x < Mathf.Abs(voronoiSitePos[i].x))
                 {
                     newExtents.x = Mathf.Abs(voronoiSitePos[i].x);
-                    newExtents.y = newExtents.x /Camera.main.aspect;
+                    newExtents.y = newExtents.x / aspect;
                 }
                 if (newExtents.y < Mathf.Abs(voronoiSitePos[i].y))
                 {
                     newExtents.y = Mathf.Abs(voronoiSitePos[i].y);
-                    newExtents.x = newExtents.y * Camera.main.aspect;
+                    newExtents.x = newExtents.y * aspect;
                 }
                     // Min camera Size for player.
                 worldBounds.extents = newExtents;
             }
-            worldBounds.extents = newExtents;
+            worldBounds.extents = newExtents*2;
         }
         public void ResizeStencilPolygoneMesh(Bounds worldBounds ,Vector3[] targetVoronoiPos)
         {
@@ -150,7 +152,7 @@ namespace VoronoiSplitScreen
                 //propertyBlock2.SetFloat("_StencilMask", i);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer, 0, Camera.main, 0, propertyBlock2);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer,0);
-                Graphics.DrawMesh(polyMaskList[i], Camera.main.transform.position+ Camera.main.transform.forward, Quaternion.identity, stencilDrawerTab[i],0,Camera.main,0);
+                //Graphics.DrawMesh(polyMaskList[i], Camera.main.transform.position+ Camera.main.transform.forward, Quaternion.identity, stencilDrawerTab[i],0,Camera.main,0);
             }
         }
         Bounds boundsGizmo;
@@ -164,6 +166,7 @@ namespace VoronoiSplitScreen
 
                 Gizmos.DrawLine(boundsGizmo.min, boundsGizmo.min + new Vector3(0, boundsGizmo.size.y, 0));
                 Gizmos.DrawLine(boundsGizmo.max, boundsGizmo.max - new Vector3(0, boundsGizmo.size.y, 0));
+
 
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawSphere(boundsGizmo.center, 0.2f);

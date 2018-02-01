@@ -10,7 +10,7 @@ namespace VoronoiSplitScreen
     {
         new Camera camera;
         Transform primaryTarget;
-        List <Transform> targetInDeadZone = new List<Transform>();
+        [SerializeField]List <Transform> targetInDeadZone = new List<Transform>();
         public Vector2 targetVoronoiScreenPos;
         int id;
 
@@ -105,10 +105,9 @@ namespace VoronoiSplitScreen
             for (int i = 0; i < target.Length; i++)
             {
                 Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
-                //viewPortPos = (viewPortPos *2)- Vector3.one;
 
-                bool onScreen = viewPortPos.x > 0.25f && viewPortPos.y > 0.25f
-                && viewPortPos.x < 0.75f && viewPortPos.y < 0.75f;
+                bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
+                && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
                 if (onScreen)
                 {
                     if (!targetInDeadZone.Contains(target[i].transform))
@@ -125,7 +124,6 @@ namespace VoronoiSplitScreen
                         Split();
                     }
                 }
-
             }
             // je parcours les joueurs.
             // j'ajoute les joueurs qui sont dans ma deadZone. 
@@ -142,7 +140,7 @@ namespace VoronoiSplitScreen
         }
         public void FollowOnePlayer()
         {
-            Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenPos*0.5f + Vector2.one) * 0.5f) - transform.position;
+            Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenPos + Vector2.one) * 0.5f) - transform.position;
             //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
             Vector3 cameraPos = primaryTarget.transform.position - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
@@ -152,17 +150,16 @@ namespace VoronoiSplitScreen
             Vector3 playerAverage = Vector3.zero;
             for (int i = 0; i < targetInDeadZone.Count; i++)
                 playerAverage += targetInDeadZone[i].position;
+            playerAverage /= targetInDeadZone.Count;
             transform.position = new Vector3(playerAverage.x, playerAverage.y, transform.position.z);
         }
         public void Update()
         {
-            //UpdateTargets();
-            FollowOnePlayer();
-            //FollowMultiplePlayer();
-            //if (targetInDeadZone.Count == 1)
-            //    FollowOnePlayer();
-            //else
-            //    FollowMultiplePlayer();
+            UpdateTargets();
+            if (targetInDeadZone.Count < 2)
+                FollowOnePlayer();
+            else
+                FollowMultiplePlayer();
         }
     }
 

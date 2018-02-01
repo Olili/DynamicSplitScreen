@@ -54,7 +54,7 @@ S3
 
 	-- Clean : 
 --> do real singleton for SplitScreenManager
-
+--> handle Command buffer more effectivly (Image effect).
 
 
 
