@@ -36,10 +36,18 @@ namespace VoronoiSplitScreen
                 return primaryTarget;
             }
         }
+
+        public List<Transform> TargetInDeadZone
+        {
+            get
+            {
+                return targetInDeadZone;
+            }
+        }
         #endregion
 
         #region CommandBuffer
-        void OnStart()
+        void InitCommmandBuffer()
         {
             if (quadPerso == null)
                 quadPerso = MeshHelper.GetQuad();
@@ -111,7 +119,7 @@ namespace VoronoiSplitScreen
             camera = GetComponent<Camera>();
             primaryTarget = _primaryTarget;
             SetID(_Id);
-            OnStart();
+            InitCommmandBuffer();
             FollowOnePlayer();
             GameObject[] target = SplitScreenManager.Singleton.Targets;
             for (int i = 0; i < target.Length; i++)

@@ -37,7 +37,7 @@ namespace VoronoiSplitScreen
         public void ComputeWorldBounds(out Bounds worldBounds, out Vector3[] voronoiSitePos)
         {
             worldBounds = new Bounds();
-            voronoiSitePos = new Vector3[targets.Length];
+            voronoiSitePos = new Vector3[splitCameraList.Count];
             Vector2 newExtents = Vector2.zero;
             Vector2 playerAveragePosition = Vector2.zero;
             for (int i = 0; i < targets.Length; i++)
@@ -47,9 +47,14 @@ namespace VoronoiSplitScreen
             worldBounds.center = playerAveragePosition /= targets.Length;
 
 
-            for (int i = 0; i < targets.Length; i++)
+            for (int i = 0; i < splitCameraList.Count; i++)
             {
-                voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);
+                for (int j = 0; j < splitCameraList[i].TargetInDeadZone.Count; j++)
+                {
+                    voronoiSitePos[i] += splitCameraList[i].TargetInDeadZone[j].position;
+                }
+                voronoiSitePos[i] = voronoiSitePos[i] / splitCameraList[i].TargetInDeadZone.Count - worldBounds.center;
+                //voronoiSitePos[i] = (targets[i].transform.position );
                 voronoiSitePos[i].z = 0;
                 newExtents = worldBounds.extents;
 
@@ -168,26 +173,21 @@ namespace VoronoiSplitScreen
             Bounds worldBounds;
             Vector3[] targetVoronoiPos;
             ComputeWorldBounds(out worldBounds, out targetVoronoiPos);
-            ResizeStencilPolygoneMesh(worldBounds, targetVoronoiPos);
+
+            if (splitCameraList.Count > 1)
+                ResizeStencilPolygoneMesh(worldBounds, targetVoronoiPos);
 
             for (int i = 0; i < splitCameraList.Count; i++)
             {
                 splitCameraList[i].targetVoronoiScreenPos.x = targetVoronoiPos[i].x / worldBounds.extents.x;
                 splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / worldBounds.extents.y;
             }
-
-            for (int i= 0; i <splitCameraList.Count;i++)
-            {
-                //MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
-                //propertyBlock.SetColor("color", debugColor[i]);
-                //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, debugMat, 0, Camera.main, 0, propertyBlock);
-                //MaterialPropertyBlock propertyBlock2 = new MaterialPropertyBlock();
-                //propertyBlock2.SetFloat("_StencilMask", i);
-                //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer, 0, Camera.main, 0, propertyBlock2);
-                //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer,0);
-                Vector3 position = splitCameraList[0].transform.position + splitCameraList[0].transform.forward;
-                Graphics.DrawMesh(polyMaskList[i], position, Quaternion.identity, stencilDrawerTab[i],0, splitCameraList[0].GetComponent<Camera>(), 0);
-            }
+            if (splitCameraList.Count > 1)
+                for (int i= 0; i <splitCameraList.Count;i++)
+                {
+                    Vector3 position = splitCameraList[0].transform.position + splitCameraList[0].transform.forward;
+                    Graphics.DrawMesh(polyMaskList[i], position, Quaternion.identity, stencilDrawerTab[i],0, splitCameraList[0].GetComponent<Camera>(), 0);
+                }
         }
         Bounds boundsGizmo;
         public void OnDrawGizmos()
