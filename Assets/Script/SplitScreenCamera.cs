@@ -12,7 +12,7 @@ namespace VoronoiSplitScreen
         Transform primaryTarget;
         [SerializeField]List <Transform> targetInDeadZone = new List<Transform>();
         public Vector2 targetVoronoiScreenPos;
-        int id;
+        [SerializeField] int id;
 
             // Command Buffer
         Mesh quadPerso;
@@ -35,11 +35,7 @@ namespace VoronoiSplitScreen
         {
             if (quadPerso == null)
                 quadPerso = MeshHelper.GetQuad();
-            if (stencilRenderer== null)
-            {
-                stencilRenderer = new Material(Shader.Find("Hidden/StencilRenderer"));
-                stencilRenderer.SetFloat("_StencilMask", id);
-            }
+           
 
             if (lastCameraRender == null)
             {
@@ -91,12 +87,19 @@ namespace VoronoiSplitScreen
         }
         #endregion
 
-
+        public void SetID(int _id)
+        {
+            id = _id;
+            if (stencilRenderer == null)
+                stencilRenderer = new Material(Shader.Find("Hidden/StencilRenderer"));
+            stencilRenderer.SetFloat("_StencilMask", id);
+            camera.depth = _id; 
+        }
         public void Init(Transform _primaryTarget, int _Id)
         {
             camera = GetComponent<Camera>();
-            id = _Id;
             primaryTarget = _primaryTarget;
+            SetID(_Id);
             OnStart();
         }
         public void UpdateTargets()
@@ -118,10 +121,10 @@ namespace VoronoiSplitScreen
                 }
                 else
                 {
-                    if (targetInDeadZone.Contains(target[i].transform))
+                    if (targetInDeadZone.Contains(target[i].transform) && target[i].transform != primaryTarget)
                     {
                         targetInDeadZone.Remove(target[i].transform);
-                        Split();
+                        Split(target[i].transform);
                     }
                 }
             }
@@ -134,9 +137,10 @@ namespace VoronoiSplitScreen
         {
                 // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
         }
-        public void Split()
+        public void Split(Transform secondaryTarget)
         {
-                // On passe à 2 camera chacun ayant leur target.
+            // On passe à 2 camera chacun ayant leur target.
+            SplitScreenManager.Singleton.Split(this, primaryTarget, secondaryTarget);
         }
         public void FollowOnePlayer()
         {
@@ -160,6 +164,8 @@ namespace VoronoiSplitScreen
                 FollowOnePlayer();
             else
                 FollowMultiplePlayer();
+
+            //FollowOnePlayer();
         }
     }
 

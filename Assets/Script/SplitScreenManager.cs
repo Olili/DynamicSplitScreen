@@ -13,6 +13,8 @@ namespace VoronoiSplitScreen
         [SerializeField] Material debugMat;
         [SerializeField] Material stencilDrawer;
         [SerializeField] Material[] stencilDrawerTab;
+        [SerializeField] SplitScreenCamera splitCameraModel;
+
         Color[] debugColor = new Color[6] { Color.white, Color.black,Color.magenta, Color.red,  Color.cyan,Color.grey};
         List <Mesh> polyMaskList;
         public GameObject[] Targets
@@ -96,9 +98,21 @@ namespace VoronoiSplitScreen
             for (int i = 0; i < targetVoronoiPos.Length; i++)
                 polyMaskList.Add(MeshHelper.GetPolygon(i, edges, targetVoronoiPos, worldBounds));
         }
-        public void Split(SplitScreenCamera splitOne,int idOne,int idTwo)
+        public void Split(SplitScreenCamera splitOne,Transform targetOne, Transform targetTwo)
         {
-            
+            AddCamera(targetTwo);
+        }
+        public void AddCamera(Transform primarTarget)
+        {
+            SplitScreenCamera newCamera = Instantiate(splitCameraModel, splitCameraList[0].transform.position, splitCameraList[0].transform.rotation, transform);
+            newCamera.Init(primarTarget, splitCameraList.Count);
+            splitCameraList.Add(newCamera);
+        }
+        public void RemoveCamera(SplitScreenCamera cam)
+        {
+            splitCameraList.Remove(cam);
+            for (int i = 0; i < splitCameraList.Count;i++)
+                splitCameraList[i].SetID(i);
         }
 
         public void Awake()
@@ -143,7 +157,7 @@ namespace VoronoiSplitScreen
                 splitCameraList[i].targetVoronoiScreenPos.y = targetVoronoiPos[i].y / worldBounds.extents.y;
             }
 
-            for (int i= 0; i < polyMaskList.Count;i++)
+            for (int i= 0; i <splitCameraList.Count;i++)
             {
                 //MaterialPropertyBlock propertyBlock = new MaterialPropertyBlock();
                 //propertyBlock.SetColor("color", debugColor[i]);
@@ -152,7 +166,7 @@ namespace VoronoiSplitScreen
                 //propertyBlock2.SetFloat("_StencilMask", i);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer, 0, Camera.main, 0, propertyBlock2);
                 //Graphics.DrawMesh(polyMaskList[i], Vector3.zero, Quaternion.identity, stencilDrawer,0);
-                //Graphics.DrawMesh(polyMaskList[i], Camera.main.transform.position+ Camera.main.transform.forward, Quaternion.identity, stencilDrawerTab[i],0,Camera.main,0);
+                Graphics.DrawMesh(polyMaskList[i], Camera.main.transform.position+ Camera.main.transform.forward, Quaternion.identity, stencilDrawerTab[i],0,Camera.main,0);
             }
         }
         Bounds boundsGizmo;
