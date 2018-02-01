@@ -45,6 +45,8 @@ namespace VoronoiSplitScreen
                 playerAveragePosition += new Vector2(targets[i].transform.position.x, targets[i].transform.position.y);
             }
             worldBounds.center = playerAveragePosition /= targets.Length;
+
+
             for (int i = 0; i < targets.Length; i++)
             {
                 voronoiSitePos[i] = (targets[i].transform.position - worldBounds.center);

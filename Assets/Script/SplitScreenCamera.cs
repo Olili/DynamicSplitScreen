@@ -136,7 +136,8 @@ namespace VoronoiSplitScreen
                 && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
                 if (onScreen)
                 {
-                    if (!targetInDeadZone.Contains(target[i].transform))
+                        // Merge
+                    if (!targetInDeadZone.Contains(target[i].transform) && target[i].transform!= primaryTarget)
                     {
                         targetInDeadZone.Add(target[i].transform);
                         Merge(primaryTarget, target[i].transform);
@@ -144,6 +145,7 @@ namespace VoronoiSplitScreen
                 }
                 else
                 {
+                        // split  
                     if (targetInDeadZone.Contains(target[i].transform) && target[i].transform != primaryTarget)
                     {
                         targetInDeadZone.Remove(target[i].transform);
