@@ -18,6 +18,7 @@ public class PlayerStart : MonoBehaviour {
         {
             Transform playerPos = transform.GetChild(i);
             playerRef[i] = Instantiate(playerModel, playerPos.position,Quaternion.identity);
+            playerRef[i].name = "player " + i;
             playerRef[i].GetComponent<SpriteRenderer>().color = playerColors[i];
             playerRef[i].GetComponent<Player>().ID = i;
         }
