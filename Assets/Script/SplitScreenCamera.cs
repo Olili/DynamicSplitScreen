@@ -9,7 +9,6 @@ namespace VoronoiSplitScreen
     public class SplitScreenCamera : MonoBehaviour
     {
         new Camera camera;
-        Transform primaryTarget;
         [SerializeField]List <Transform> targetInDeadZone = new List<Transform>();
         public Vector2 targetVoronoiScreenOffset;
         [SerializeField] int id;
@@ -29,14 +28,7 @@ namespace VoronoiSplitScreen
             set { id = value; }
         }
 
-        public Transform PrimaryTarget
-        {
-            get
-            {
-                return primaryTarget;
-            }
-        }
-
+        
         public List<Transform> TargetInDeadZone
         {
             get
@@ -117,23 +109,22 @@ namespace VoronoiSplitScreen
         public void Init(Transform _primaryTarget, int _Id)
         {
             camera = GetComponent<Camera>();
-            primaryTarget = _primaryTarget;
+            //targetInDeadZone.Add(_primaryTarget);
             SetID(_Id);
             InitCommmandBuffer();
-            GameObject[] target = SplitScreenManager.Singleton.Targets;
-            for (int i = 0; i < target.Length; i++)
-            {
-                Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
-                bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
-                && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
-                if (onScreen)
-                {
-                    targetInDeadZone.Add(target[i].transform); ;
-                }
-            }
-            if (targetInDeadZone.Count == 0)
-            {
-            }
+            //GameObject[] target = SplitScreenManager.Singleton.Targets;
+            //for (int i = 0; i < target.Length; i++)
+            //{
+            //    Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
+            //    bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
+            //    && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
+            //    if (onScreen)
+            //    {
+            //        if (!targetInDeadZone.Contains(target[i].transform))
+            //            targetInDeadZone.Add(target[i].transform);
+            //    }
+            //}
+           
         }
         public void UpdateTargets()
         {
@@ -142,24 +133,30 @@ namespace VoronoiSplitScreen
             {
                 Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
 
-                bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
-                && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
+                bool onScreen = viewPortPos.x >= 0.245f && viewPortPos.y >= 0.245f
+                && viewPortPos.x <= 0.755f && viewPortPos.y <= 0.755f;
                 if (onScreen)
                 {
-                        // Merge
-                    if (!targetInDeadZone.Contains(target[i].transform) && target[i].transform!= primaryTarget)
+                    // Merge
+                    if (!targetInDeadZone.Contains(target[i].transform))
                     {
-                        targetInDeadZone.Add(target[i].transform);
-                        Merge(primaryTarget, target[i].transform);
+                        //Debug.Log(this +" TryMerging " + target[i].transform);
+                        //Merge(primaryTarget, target[i].transform);
+                        SplitScreenManager.Singleton.Merge(target[i].transform, this);
+                        break;
                     }
                 }
                 else
                 {
-                        // split  
-                    if (targetInDeadZone.Contains(target[i].transform) && target[i].transform != primaryTarget)
+                    // split  
+                    if (targetInDeadZone.Contains(target[i].transform))
                     {
-                        targetInDeadZone.Remove(target[i].transform);
-                        SplitScreenManager.Singleton.Split(this, target[i].transform);
+                        //targetInDeadZone.Remove(target[i].transform);
+
+                        SplitScreenManager.Singleton.Split(this);
+                        Debug.Log(this + " Splitting " + target[i].transform);
+                        //Debug.Break();
+                        break;
                     }
                 }
             }
@@ -168,13 +165,15 @@ namespace VoronoiSplitScreen
             // Si un joueur n'est plus dans ma deadZone. (=> stuff
             // Si un joueur est ajouté à ma deadZone (=>suff
         }
-        public void Merge(Transform primary, Transform secondTarget)
-        {
-            // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
-            SplitScreenManager.Singleton.Merge(primary, secondTarget, this);
-        }
+        //public void Merge(Transform primary, Transform secondTarget)
+        //{
+        //    // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
+        //    SplitScreenManager.Singleton.Merge(primary, secondTarget, this);
+        //}
         public void FollowOnePlayer()
         {
+            if (targetInDeadZone.Count == 0) return;
+
             Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenOffset + Vector2.one) * 0.5f) - transform.position;
             //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
             Vector3 targetCenter = Vector3.zero;
@@ -186,23 +185,22 @@ namespace VoronoiSplitScreen
             Vector3 cameraPos = targetCenter - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         }
-        public void FollowMultiplePlayer()
+        //public void FollowMultiplePlayer()
+        //{
+        //    Vector3 playerAverage = Vector3.zero;
+        //    for (int i = 0; i < targetInDeadZone.Count; i++)
+        //        playerAverage += targetInDeadZone[i].position;
+        //    playerAverage /= targetInDeadZone.Count;
+        //    transform.position = new Vector3(playerAverage.x, playerAverage.y, transform.position.z);
+        //}
+        public void UpdateTest()
         {
-            Vector3 playerAverage = Vector3.zero;
-            for (int i = 0; i < targetInDeadZone.Count; i++)
-                playerAverage += targetInDeadZone[i].position;
-            playerAverage /= targetInDeadZone.Count;
-            transform.position = new Vector3(playerAverage.x, playerAverage.y, transform.position.z);
-        }
-        public void Update()
-        {
-            UpdateTargets();
             //if (targetInDeadZone.Count < 2)
             //    FollowOnePlayer();
             //else
             //    FollowOnePlayer();
             FollowOnePlayer();
-
+            UpdateTargets();
         }
         //public void OnDrawGizmos()
         //{
@@ -219,6 +217,24 @@ namespace VoronoiSplitScreen
         //    Vector3 center = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         //    Gizmos.DrawSphere(center, 0.5f);
         //}
+        public void OnDrawGizmos()
+        {
+
+            if (Application.isPlaying)
+            {
+                Vector3 center = camera.transform.position;
+                Vector3 upLeft = camera.ViewportToWorldPoint(new Vector3(0.25f, 0.75f));
+                Vector3 upRight = camera.ViewportToWorldPoint(new Vector3(0.75f, 0.75f));
+                Vector3 downRight = camera.ViewportToWorldPoint(new Vector3(0.75f, 0.25f));
+                Vector3 downLeft = camera.ViewportToWorldPoint(new Vector3(0.25f, 0.25f));
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(upLeft, upRight);
+                Gizmos.DrawLine(upRight, downRight);
+
+                Gizmos.DrawLine(downRight, downLeft);
+                Gizmos.DrawLine(downLeft, upLeft);
+            }
+        }
     }
 
 }

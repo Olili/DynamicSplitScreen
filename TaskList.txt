@@ -82,7 +82,7 @@ avoir les bonnes targets.)
 
 
 
-
+--> Groupe 3 lorsqu'un s'écarte mon evennement split peut être déclenché par l'un des 2 autres (PB)
 
 
 
