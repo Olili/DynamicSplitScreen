@@ -112,19 +112,21 @@ namespace VoronoiSplitScreen
             //targetInDeadZone.Add(_primaryTarget);
             SetID(_Id);
             InitCommmandBuffer();
-            //GameObject[] target = SplitScreenManager.Singleton.Targets;
-            //for (int i = 0; i < target.Length; i++)
-            //{
-            //    Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
-            //    bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
-            //    && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
-            //    if (onScreen)
-            //    {
-            //        if (!targetInDeadZone.Contains(target[i].transform))
-            //            targetInDeadZone.Add(target[i].transform);
-            //    }
-            //}
-           
+        }
+        public void GetAllTargetInDeadZone()
+        {
+            GameObject[] target = SplitScreenManager.Singleton.Targets;
+            for (int i = 0; i < target.Length; i++)
+            {
+                Vector3 viewPortPos = camera.WorldToViewportPoint(target[i].transform.position);
+                bool onScreen = viewPortPos.x >= 0.25f && viewPortPos.y >= 0.25f
+                && viewPortPos.x <= 0.75f && viewPortPos.y <= 0.75f;
+                if (onScreen)
+                {
+                    if (!targetInDeadZone.Contains(target[i].transform))
+                        targetInDeadZone.Add(target[i].transform);
+                }
+            }
         }
         public void UpdateTargets()
         {
@@ -165,10 +167,21 @@ namespace VoronoiSplitScreen
             // Si un joueur n'est plus dans ma deadZone. (=> stuff
             // Si un joueur est ajouté à ma deadZone (=>suff
         }
-        //public void Merge(Transform primary, Transform secondTarget)
+
+        //public void FollowOnePlayer()
         //{
-        //    // sur 2 camera il n'en existe plus qu'une et elle est repositionnée.
-        //    SplitScreenManager.Singleton.Merge(primary, secondTarget, this);
+        //    if (targetInDeadZone.Count == 0) return;
+
+        //    Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenOffset + Vector2.one) * 0.5f) - transform.position;
+        //    //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
+        //    Vector3 targetCenter = Vector3.zero;
+        //    for (int i = 0; i < targetInDeadZone.Count; i++)
+        //    {
+        //        targetCenter += targetInDeadZone[i].position;
+        //    }
+        //    targetCenter /= targetInDeadZone.Count;
+        //    Vector3 cameraPos = targetCenter - playerOffSet;
+        //    transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         //}
         public void FollowOnePlayer()
         {
@@ -178,22 +191,37 @@ namespace VoronoiSplitScreen
             //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
             Vector3 targetCenter = Vector3.zero;
             for (int i = 0; i < targetInDeadZone.Count; i++)
+            //for (int i = 0; i < SplitScreenManager.Singleton.Targets.Length; i++)
             {
-                targetCenter += targetInDeadZone[i].position;
+                targetCenter += targetInDeadZone[i].transform.position;
+                //targetCenter += SplitScreenManager.Singleton.Targets[i].transform.position;
             }
             targetCenter /= targetInDeadZone.Count;
+            //targetCenter /= SplitScreenManager.Singleton.Targets.Length;
             Vector3 cameraPos = targetCenter - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         }
-        //public void FollowMultiplePlayer()
+        //public void FollowOnePlayer()
         //{
-        //    Vector3 playerAverage = Vector3.zero;
-        //    for (int i = 0; i < targetInDeadZone.Count; i++)
-        //        playerAverage += targetInDeadZone[i].position;
-        //    playerAverage /= targetInDeadZone.Count;
-        //    transform.position = new Vector3(playerAverage.x, playerAverage.y, transform.position.z);
+        //    if (targetInDeadZone.Count == 0) return;
+
+        //    //Vector3 playerOffSet = camera.ViewportToWorldPoint((targetVoronoiScreenOffset + Vector2.one) * 0.5f) - transform.position;
+        //    //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
+        //    Vector3 targetCenter = Vector3.zero;
+        //    for (int i = 0; i < SplitScreenManager.Singleton.Targets.Length; i++)
+        //    {
+        //        targetCenter += SplitScreenManager.Singleton.Targets[i].transform.position;
+        //    }
+        //    //targetCenter /= targetInDeadZone.Count;
+        //    targetCenter /= SplitScreenManager.Singleton.Targets.Length;
+
+
+
+        //    Vector3 cameraPos = targetCenter + Vector3.Scale(targetVoronoiScreenOffset, SplitScreenManager.Singleton.testVoronoiBounds.extents);
+        //    transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         //}
-        public void UpdateTest()
+
+        public void Update()
         {
             //if (targetInDeadZone.Count < 2)
             //    FollowOnePlayer();

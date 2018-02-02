@@ -285,6 +285,9 @@ MonoBehaviour:
   stencilDrawerTab: []
   splitCameraModel: {fileID: 114896859327025890, guid: d20084b4f3b501d43829eb201c880440,
     type: 2}
+  testVoronoiBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
 --- !u!1 &89528747
 GameObject:
   m_ObjectHideFlags: 0
@@ -999,7 +1002,7 @@ Prefab:
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
       propertyPath: nbPlayers
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4863601645241558, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
       propertyPath: m_LocalPosition.x
