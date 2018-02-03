@@ -72,15 +72,46 @@ namespace VoronoiSplitScreen
             return polygone;
         }
 
-        /*
-            Refacto organisation mesh :
-            --> 1er arrivée est l'arrivée du premier edge.
-            -->E0 je chope un EndPoint. Je cherche si EndPoint est lié à un edge. 
-                -->E01 Si oui je chop cette edge puis retour E0 avec l'autre point de l'edge.
-                -->E02 Si non je cherche parmis les bords qui lui appartiennt un bord qui est lié à ce truc.
-            --> stop lorsque je retourne a la première arrivée.
-        */
-        static Vector3[] GetPolyVertices(int curSite, Vector3[] sitePosList, List<GraphEdge> listEdges,Bounds bounds)
+        public static Vector2 Compute2DPolygonCentroid(List<Vector3> vertices)
+        {
+            Vector2 centroid = Vector2.zero;
+            float signedArea = 0;
+            float x0 = 0; // Current vertex X
+            float y0 = 0; // Current vertex Y
+            float x1 = 0; // Next vertex X
+            float y1 = 0; // Next vertex Y
+            float a = 0;  // Partial signed area
+
+            // For all vertices
+            int i = 0;
+            for (i=0; i< vertices.Count; ++i)
+            {
+                x0 = vertices[i].x;
+                y0 = vertices[i].y;
+                x1 = vertices[(i + 1) % vertices.Count].x;
+                y1 = vertices[(i + 1) % vertices.Count].y;
+                a = x0* y1 - x1* y0;
+                signedArea += a;
+                centroid.x += (x0 + x1)*a;
+                centroid.y += (y0 + y1)*a;
+            }
+
+            signedArea *= 0.5f;
+            centroid.x /= (6.0f* signedArea);
+            centroid.y /= (6.0f* signedArea);
+            return centroid;
+        }
+
+
+/*
+    Refacto organisation mesh :
+    --> 1er arrivée est l'arrivée du premier edge.
+    -->E0 je chope un EndPoint. Je cherche si EndPoint est lié à un edge. 
+        -->E01 Si oui je chop cette edge puis retour E0 avec l'autre point de l'edge.
+        -->E02 Si non je cherche parmis les bords qui lui appartiennt un bord qui est lié à ce truc.
+    --> stop lorsque je retourne a la première arrivée.
+*/
+static Vector3[] GetPolyVertices(int curSite, Vector3[] sitePosList, List<GraphEdge> listEdges,Bounds bounds)
         {
             // creation des borderVertices
             List<Vector3> borderVertices = new List<Vector3>

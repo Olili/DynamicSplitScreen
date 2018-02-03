@@ -8,3 +8,56 @@ TargetVoronoi Screen pos : va de -1 à 1.
 
 playerOffset : distance entre player et camera en mètres unity.
 
+Je vais essayer une autre option à base de : je sui toujours une seule personne. 
+--> Follow : Il y a toujours autant de zone. et une camera peut avoir plusieurs zone. 
+--> TargetVoronoi : One ne suit qu'une target.
+--> Split: On garde la target 0
+--> Merge : Ok.
+
+--> On va avoir un problème avec get Camera:
+
+
+Actuelle semi instable mais surtout ne résout pas la pb. 
+
+ A refaire : 
+--> Les bounds du monde dans lequel on fait voronoi. (car différent de sa solution.
+--> Savoir si une camera peut nous filmer ou pas ( Principal problème actuel)
+	--> collison avec nos polygone actuels ?
+	--> SI la distance player -- player dans le monde est inférieure à la distance player -- player sur l'écran. il faut Merge.
+	--> Si la distance player -- player dans Voronoi convertis en Ecran est > 
+
+
+
+--> Monde --> Découpe World Bounds. --> Voronoi. 
+Voronoi passe de 0 à 1.
+--> Chaque joueurs est centré avec le meme ratio. [0] à 1. Cela donne sa position à l'écran ( Ausside de 0 à ScreenWidth).
+	--> Si position de 0 à ScreenWidth < distance monde. ALors il faut Merge.
+	--> Si la position 0 à screenWidth > distance monde. Alors il faut Split.
+
+
+
+	REal stuff : 
+Je suis en train de comprendre comment il fait. 
+--> Il trouve des sortes de centre dans les régions Voronoï. 
+	--> Ces centre seront les position des players à l'écran
+
+On Resume l'algorithme : 
+	--> On Calcule des worlds bounds. 
+	--> On Fait Voronoi sur les Worlds Bounds. 
+	--> On On Calcule le centre de chaques Voronoi Area.
+		--> Ces centre serviront de position des joueurs à l'écran.
+	Quelle est la position des camera ? 
+	--> On certis les centre en Position à l'écran ( 0 -1)
+		--> La camera doit se positionner pour afficher le joueur à cet endroit.
+
+
+
+
+Pour split : 
+
+
+
+
+	
+		
+
