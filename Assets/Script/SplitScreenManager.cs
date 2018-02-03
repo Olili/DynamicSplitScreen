@@ -33,6 +33,7 @@ namespace VoronoiSplitScreen
                 return singleton;
             }
         }
+       
         public Bounds testVoronoiBounds;
         public void ComputeWorldBounds(out Bounds worldBounds, out Vector3[] voronoiSitePos)
         {
@@ -70,7 +71,7 @@ namespace VoronoiSplitScreen
                     // Min camera Size for player.
                 worldBounds.extents = newExtents;
             }
-            worldBounds.extents = newExtents*2;
+            worldBounds.extents = newExtents*1.1f;
 
             testVoronoiBounds = worldBounds;
         }
@@ -129,9 +130,10 @@ namespace VoronoiSplitScreen
         public void Split(SplitScreenCamera splitOne)
         {
                 // on récupère le connard qui s'en va
+
             Transform farthestTarget = null;
             float maxDist = 0;
-            for (int i = 0;i < splitOne.TargetInDeadZone.Count;i++)
+            for (int i = 1;i < splitOne.TargetInDeadZone.Count;i++)
             {
                 float distance = Vector3.Distance(splitOne.TargetInDeadZone[i].position, splitOne.transform.position);
                 if (distance > maxDist)
@@ -140,6 +142,7 @@ namespace VoronoiSplitScreen
                     farthestTarget = splitOne.TargetInDeadZone[i];
                 }
             }
+            Debug.Log(splitOne + " Splitting " + farthestTarget);
             if (splitOne.TargetInDeadZone.Count == 1)
             {
                 Debug.Log("Stop");
@@ -168,6 +171,7 @@ namespace VoronoiSplitScreen
             SplitScreenCamera newCamera = Instantiate(splitCameraModel, position, splitCameraList[0].transform.rotation, transform);
             splitCameraList.Add(newCamera);
             newCamera.Init(primaryTarget, splitCameraList.Count-1);
+            newCamera.name = "splitCamera" + (splitCameraList.Count - 1);
             return newCamera;
         }
         public void RemoveCamera(SplitScreenCamera cam)
@@ -180,6 +184,32 @@ namespace VoronoiSplitScreen
             for (int i = 0; i < splitCameraList.Count;i++)
                 splitCameraList[i].SetID(i);
         }
+       
+        [HideInInspector]public Vector3[] targetVoronoiOffsetTest = null;
+        public void UpdateCameraTargetOffset(Vector3[] targetVoronoiPos,Bounds voronoiBounds)
+        {
+            for (int i = 0; i < splitCameraList.Count; i++)
+            {
+                SplitScreenCamera splitCamera = splitCameraList[i];
+                if (voronoiBounds.extents != Vector3.zero)
+                {
+                    for (int j = 0; j < Targets.Length; j++)
+                    {
+                        Transform target = Targets[j].transform;
+                        if (splitCamera.TargetInDeadZone[0] == target)
+                        {
+                            splitCamera.targetVoronoiScreenOffset.x = targetVoronoiPos[j].x / voronoiBounds.extents.x;
+                            splitCamera.targetVoronoiScreenOffset.y = targetVoronoiPos[j].y / voronoiBounds.extents.y;
+                            targetVoronoiOffsetTest[j] = splitCamera.targetVoronoiScreenOffset;
+                        }
+                    }
+                }
+                else
+                {
+                    splitCamera.targetVoronoiScreenOffset = Vector2.zero;
+                }
+            }
+        }
         public void Awake()
         {
             singleton = this;
@@ -191,33 +221,7 @@ namespace VoronoiSplitScreen
                 stencilDrawerTab[i] = new Material(Shader.Find("Stencils/StencilDrawer"));
                 stencilDrawerTab[i].SetFloat("_StencilMask", i);
             }
-
-        }
-       
-        public void UpdateCameraTargetOffset(Vector3[] targetVoronoiPos,Bounds voronoiBounds)
-        {
-            for (int i = 0; i < splitCameraList.Count; i++)
-            {
-                SplitScreenCamera splitCamera = splitCameraList[i];
-                if (voronoiBounds.extents != Vector3.zero)
-                {
-                    splitCamera.targetVoronoiScreenOffset = Vector2.zero;
-                    for (int j = 0; j < Targets.Length; j++)
-                    {
-                        Transform target = Targets[j].transform;
-                        if (splitCamera.TargetInDeadZone.Contains(target))
-                        {
-                            splitCamera.targetVoronoiScreenOffset.x += targetVoronoiPos[j].x / voronoiBounds.extents.x;
-                            splitCamera.targetVoronoiScreenOffset.y += targetVoronoiPos[j].y / voronoiBounds.extents.y;
-                        }
-                    }
-                    splitCamera.targetVoronoiScreenOffset /= splitCamera.TargetInDeadZone.Count;
-                }
-                else
-                {
-                    splitCamera.targetVoronoiScreenOffset = Vector2.zero;
-                }
-            }
+            
         }
         public void Start()
         {
@@ -228,7 +232,7 @@ namespace VoronoiSplitScreen
                 splitCameraList.Add(splitCamera);
                 splitCamera.GetAllTargetInDeadZone();
             }
-            
+            targetVoronoiOffsetTest = new Vector3[Targets.Length];
         }
         
         public void Update()
