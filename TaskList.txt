@@ -92,3 +92,139 @@ avoir les bonnes targets.)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			Nouvelle solution  : 
+
+	I réoganiser pour faciliter les test : 
+--> Calcul des points Voronoi sur l'écran . 
+--> Calcul des centres Voronoi sur l'écran. 
+--> Pourvoir centrer la camera sur les points voronoi ou les centres voronoi. 
+--> pouvoir centrer la camera sur la moyenne des targets ou une seule. 
+
+	Comprendre : 
+--> Existe-t-il une distance / dead zone à partir de laquelle on peut décider de merge / faire varier cette dead zone. 
+
+
+--> Comment gérer fusion/split ? 
+	I positionnement camera : 
+		--> Quel est l'offset de la camera par rapport à sa cible ? 
+		--> Quel est la position à l'écran d'une cible ? 
+	II Evenement de merge / split. 
+		--> A quel moment je dois lancer un merge. 
+		--> A quel moment je dois lancer un split. 
+
+	I positionnement de la camera. 
+		--> position à l'écran d'une cible.
+			--> Si j'utilise les centres Voronoi alors ce ne sera pas réel : 
+				--> Split/merge Cassure. 
+			--> Si j'utilise les position voronoi alors on est centré comme de la merde. 
+				--> Split merge incohérent et difficile ( la distance en voronoi n'est pas représentative de la distance que 
+				doivent avoir les joueurs à l'écran.
+
+
+
+	II Merge / split : 
+			Actuellement : 
+			--> j'utilise la différence entre la distance Voronoi des player par rapport à 
+			la distance reelle entre les player.
+				--> la distance voronoi convertie en distance monde ( la  différence entre 2 position occupée à l'écran).
+			--> Si la distance monde est inférieur à la distance ecran alors il faut merge.
+			--> Problème une fois 3 joueur atteint il devient quasi impossible de merge car la distance screen devient ridiculement petite.
+			Alternative : 
+			--> Lorsque 2 player sont dans la deadZone d'une camera alors il faut merge/split
+				--> problème a + de deux player la dead zone d'une camera ne représente pas ce qu'elle va filmer
+				a l'écran. donc on peut ne plus être a l'écran alors que la camera croit nous filmer
+				--> problème Merge / Slit cassure.
+			
+			Alternative : 
+			--> Lorsque les 2 camera atteignent des position presque identique alors il faut merge. 
+				--> Pourquoi pas mais prblème est en fait : Comment bien positionner les camera.
+
+
+
+
+
+	La solution efficace à 2 players : 
+--> On utilise les Voronoi points comme position a l'écran pour afficher le joueur. 
+	--> Pas centré sur les voronoi regions mais c'est ok. 
+--> lorsqu'on est très proche. Les bounds correspondent à la forme de l'écran
+ainsi pas de Cassure en split/merge. 
+
+--> On peut choisir de split merge soit :
+	--> Lorsqu'on rentre dans une deadZone. 
+	--> lorsque la position des joueur à l'écran est inférieur à la distance Voronoi. 
+
+	Pourquoi cette solution n'est plus efficace à n players : 
+--> Lorsque 2 player sont proche il n'y a pas de correspondance entre les bounds Voronoi
+et l'écran. Ainsi cassure/split.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	Idée vague : 
+--> je peux utiliser les voronoi points pour définir la distance entre les joueur 
+diviser par les voronoiBounds.
+La distance entre 2 points me donne l'écartement en ratio des joueurs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

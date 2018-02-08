@@ -82,8 +82,6 @@ namespace VoronoiSplitScreen
 
                 // je draw de renderTarget vers CameraRD avec le tempBuffer Comme texture.
                 camera.AddCommandBuffer(CameraEvent.BeforeImageEffects, cmdBufferStencil);
-
-                  
             }
             
         }
@@ -128,20 +126,47 @@ namespace VoronoiSplitScreen
                 }
             }
         }
+        public void UpdateTargetWithDeadZone()
+        {
+            GameObject[] targets = SplitScreenManager.Singleton.Targets;
+            for (int i = 0; i < targets.Length;i++)
+            {
+                if (targets[i].transform == targetInDeadZone[0])
+                    continue;
+                Vector3 screenPosition = camera.WorldToViewportPoint(targets[i].transform.position);
+                bool onScreen = (screenPosition.x > 0.25 && screenPosition.x < 0.75
+                    && screenPosition.y > 0.25 && screenPosition.y < 0.75);
+                if (onScreen)
+                {
+                    if (!targetInDeadZone.Contains(targets[i].transform))
+                    {
+                        SplitScreenManager.Singleton.Merge(targets[i].transform, this);
+                        break;
+                    }
+                }
+                else
+                {
+                    if (targetInDeadZone.Contains(targets[i].transform))
+                    {
+                        SplitScreenManager.Singleton.Split(this);
+                        break;
+                    }
+                }
+            }
+        }
         public void UpdateTargets()
         {
             GameObject[] target = SplitScreenManager.Singleton.Targets;
 
-            Vector3 targetScreenPos = camera.ViewportToWorldPoint(targetVoronoiScreenOffset ) - transform.position;
+            Vector3 VoronoiScreenOffset = SplitScreenManager.Singleton.GetPrimaryVoronoiIndication(this);
+            Vector3 targetScreenPos = camera.ViewportToWorldPoint(VoronoiScreenOffset) - transform.position;
             targetScreenPos.z = 0;
             
             for (int i = 0; i < target.Length; i++)
             {
                 if (target[i].transform == targetInDeadZone[0])
                     continue;
-                Vector3 test = SplitScreenManager.Singleton.targetVoronoiOffsetTest[i] ;
-                test.z = 0;
-                Vector3 otherScreenPos = camera.ViewportToWorldPoint(test) - transform.position;
+                Vector3 otherScreenPos = camera.ViewportToWorldPoint(SplitScreenManager.Singleton.voronoiCameraIndication[i]) - transform.position;
 
                 otherScreenPos.z = 0;
                 float screenDistance = Vector3.Distance(targetScreenPos, otherScreenPos);
@@ -165,11 +190,32 @@ namespace VoronoiSplitScreen
                 }
             }
         }
+        public void FollowMultiplePlayer()
+        {
+            Vector3 voronoiScreenOffset = Vector3.zero;
+            for (int i = 0; i < TargetInDeadZone.Count; i++)
+                for (int j = 0; j < SplitScreenManager.Singleton.Targets.Length;j++)
+                    if (targetInDeadZone[i] == SplitScreenManager.Singleton.Targets[j].transform)
+                    {
+                        Vector3 Vconvert = SplitScreenManager.Singleton.voronoiCameraIndication[j];
+                        voronoiScreenOffset += Vconvert;
+                    }
+            voronoiScreenOffset /= TargetInDeadZone.Count;
+            Vector3 playerOffSet = camera.ViewportToWorldPoint(voronoiScreenOffset) - transform.position;
+            Vector3 targetCenter = Vector3.zero;
+            for (int i = 0; i < targetInDeadZone.Count;i++)
+                targetCenter+= targetInDeadZone[i].position;
+            targetCenter *= ((float)1 / targetInDeadZone.Count);
+
+            Vector3 cameraPos = targetCenter - playerOffSet;
+            transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
+        }
        
         public void FollowOnePlayer()
         {
             if (targetInDeadZone.Count == 0) return;
-            Vector3 playerOffSet = camera.ViewportToWorldPoint(targetVoronoiScreenOffset ) - transform.position;
+            Vector3 voronoiScreenOffset = SplitScreenManager.Singleton.GetPrimaryVoronoiIndication(this);
+            Vector3 playerOffSet = camera.ViewportToWorldPoint(voronoiScreenOffset) - transform.position;
             //Vector3 playerOffSet = camera.ViewportToWorldPoint(new Vector3(1,1,0)) - transform.position;
             Vector3 targetCenter = targetInDeadZone[0].position;
             Vector3 cameraPos = targetCenter - playerOffSet;
@@ -181,7 +227,7 @@ namespace VoronoiSplitScreen
 
         public void Update()
         {
-            FollowOnePlayer();
+            FollowMultiplePlayer();
             UpdateTargets();
         }
         //public void OnDrawGizmos()

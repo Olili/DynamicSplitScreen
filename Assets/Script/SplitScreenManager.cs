@@ -18,7 +18,10 @@ namespace VoronoiSplitScreen
         Color[] debugColor = new Color[6] { Color.magenta,Color.white, Color.black, Color.red,  Color.cyan,Color.grey};
         List <Mesh> polyMaskList;
 
-        public Vector2[] playerScreenPosition;
+        public Vector2[] voronoiRegionPoints; // map [0,1]
+        public Vector2[] voronoiRegionCenter; // map [0,1]
+        public Vector2[] voronoiCameraIndication; // map [0,1]
+        public Bounds testVoronoiBounds;
 
         public GameObject[] Targets
         {
@@ -39,42 +42,29 @@ namespace VoronoiSplitScreen
        
         void ComputePlayerScreenPosition()
         {
-            playerScreenPosition = new Vector2[polyMaskList.Count];
+            voronoiRegionCenter = new Vector2[polyMaskList.Count];
             List<Vector3> vertices = new List<Vector3>();
             for (int i = 0; i < polyMaskList.Count; i++)
             {
                 //polyMaskList[i].
                 // Compute average
                 polyMaskList[i].GetVertices(vertices);
-                playerScreenPosition[i] = Vector3.zero;
+                voronoiRegionCenter[i] = Vector3.zero;
                 for (int j = 0; j < vertices.Count; j++)
                 {
                     vertices[j] = new Vector3(vertices[j].x, vertices[j].y * -1, 0);
                 }
-                playerScreenPosition[i] = MeshHelper.Compute2DPolygonCentroid(vertices);
-                //for (int j = 0; j < vertices.Count; j++)
-                //{
-                //    playerScreenPosition[i] += new Vector2(vertices[j].x, vertices[j].y*-1);
-                //    Vector2 test = new Vector2(vertices[j].x, vertices[j].y *-1);
-                //    Debug.DrawLine(vertices[j], vertices[(j+1) % vertices.Count], debugColor[i]);
-                //}
-                //playerScreenPosition[i] = playerScreenPosition[i]/ (float)vertices.Count;
-                Debug.DrawLine(Vector3.zero, playerScreenPosition[i], Color.yellow);
-                // Inverse Y  : 
-                //playerScreenPosition[i].y *= -1;
-                // Map ( value C [-1,1] to [0,1] )
-                playerScreenPosition[i] = (playerScreenPosition[i] + Vector2.one) * 0.5f;
-
-                targetVoronoiOffsetTest[i] = playerScreenPosition[i];
-
+                voronoiRegionCenter[i] = MeshHelper.Compute2DPolygonCentroid(vertices);
+                Debug.DrawLine(Vector3.zero, voronoiRegionCenter[i], Color.yellow);
+                voronoiRegionCenter[i] = (voronoiRegionCenter[i] + Vector2.one) * 0.5f;
             }
 
         }
-        public Bounds testVoronoiBounds;
         public void ComputeWorldBounds(out Bounds worldBounds, out Vector3[] voronoiSitePos)
         {
             worldBounds = new Bounds();
             voronoiSitePos = new Vector3[Targets.Length];
+            voronoiRegionPoints = new Vector2[Targets.Length];
             Vector2 newExtents = Vector2.zero;
             Vector2 playerAveragePosition = Vector2.zero;
             for (int i = 0; i < targets.Length; i++)
@@ -107,8 +97,13 @@ namespace VoronoiSplitScreen
                     // Min camera Size for player.
                 worldBounds.extents = newExtents;
             }
-            worldBounds.extents = newExtents*1.1f;
-
+            worldBounds.extents = newExtents*2f;
+            for (int i = 0; i < targets.Length;i++)
+            {
+                voronoiRegionPoints[i].x = voronoiSitePos[i].x / worldBounds.extents.x;
+                voronoiRegionPoints[i].y = voronoiSitePos[i].y / worldBounds.extents.y;
+                voronoiRegionPoints[i] = (voronoiRegionPoints[i] + Vector2.one) * 0.5f;
+            }
             testVoronoiBounds = worldBounds;
         }
         public void ResizeStencilPolygoneMesh(Bounds worldBounds ,Vector3[] targetVoronoiPos)
@@ -222,7 +217,7 @@ namespace VoronoiSplitScreen
                 splitCameraList[i].SetID(i);
         }
        
-        [HideInInspector]public Vector3[] targetVoronoiOffsetTest = null;
+
         //public void UpdateCameraTargetOffset(Vector3[] targetVoronoiPos,Bounds voronoiBounds)
         //{
         //    for (int i = 0; i < splitCameraList.Count; i++)
@@ -259,7 +254,7 @@ namespace VoronoiSplitScreen
                         Transform target = Targets[j].transform;
                         if (splitCamera.TargetInDeadZone[0] == target)
                         {
-                            splitCamera.targetVoronoiScreenOffset = playerScreenPosition[j];
+                            splitCamera.targetVoronoiScreenOffset = voronoiRegionCenter[j];
                         }
                     }
                 }
@@ -267,8 +262,20 @@ namespace VoronoiSplitScreen
                 {
                     splitCamera.targetVoronoiScreenOffset = Vector2.zero;
                 }
+                voronoiCameraIndication = voronoiRegionPoints;
             }
         }
+        public Vector3 GetPrimaryVoronoiIndication(SplitScreenCamera camera)
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (camera.TargetInDeadZone[0] == targets[i].transform)
+                    return voronoiCameraIndication[i];
+            }
+            Debug.LogError("Camera has no targets");
+            return Vector3.zero;
+        }
+
         public void Awake()
         {
             singleton = this;
@@ -291,7 +298,6 @@ namespace VoronoiSplitScreen
                 splitCameraList.Add(splitCamera);
                 splitCamera.GetAllTargetInDeadZone();
             }
-            targetVoronoiOffsetTest = new Vector3[Targets.Length];
         }
         
         public void Update()
