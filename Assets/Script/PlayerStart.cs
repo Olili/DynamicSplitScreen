@@ -31,4 +31,12 @@ public class PlayerStart : MonoBehaviour {
 	void Update () {
 		
 	}
+    public void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 0.49f, 0.313f);
+        if (playerRef!=null)
+            for (int i = 0; i < playerRef.Length;i++)
+                for (int j = 0; j < playerRef.Length; j++)
+                    Gizmos.DrawLine(playerRef[i ].transform.position, playerRef[j].transform.position);
+    }
 }

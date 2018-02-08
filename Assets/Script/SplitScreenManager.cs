@@ -8,7 +8,7 @@ namespace VoronoiSplitScreen
     public class SplitScreenManager : MonoBehaviour
     {
         static SplitScreenManager singleton;
-        List<SplitScreenCamera> splitCameraList;
+        public List<SplitScreenCamera> splitCameraList;
         [SerializeField] GameObject[] targets;
         [SerializeField] Material debugMat;
         [SerializeField] Material stencilDrawer;
@@ -21,6 +21,7 @@ namespace VoronoiSplitScreen
         public Vector2[] voronoiRegionPoints; // map [0,1]
         public Vector2[] voronoiRegionCenter; // map [0,1]
         public Vector2[] voronoiCameraIndication; // map [0,1]
+        public Vector2[] worldVoronoiPointAverage;
         public Bounds testVoronoiBounds;
 
         public GameObject[] Targets
@@ -97,7 +98,7 @@ namespace VoronoiSplitScreen
                     // Min camera Size for player.
                 worldBounds.extents = newExtents;
             }
-            worldBounds.extents = newExtents*2f;
+            worldBounds.extents = newExtents*1.2f;
             for (int i = 0; i < targets.Length;i++)
             {
                 voronoiRegionPoints[i].x = voronoiSitePos[i].x / worldBounds.extents.x;
@@ -262,9 +263,16 @@ namespace VoronoiSplitScreen
                 {
                     splitCamera.targetVoronoiScreenOffset = Vector2.zero;
                 }
-                voronoiCameraIndication = voronoiRegionPoints;
+                
+                if (testChange)
+                    voronoiCameraIndication = voronoiRegionCenter;
+                else
+                    voronoiCameraIndication = voronoiRegionPoints;
             }
+            if (Input.GetKeyDown(KeyCode.P))
+                testChange = !testChange;
         }
+        bool testChange = true;
         public Vector3 GetPrimaryVoronoiIndication(SplitScreenCamera camera)
         {
             for (int i = 0; i < targets.Length; i++)
@@ -274,6 +282,13 @@ namespace VoronoiSplitScreen
             }
             Debug.LogError("Camera has no targets");
             return Vector3.zero;
+        }
+        public int GetTargetId(Transform target)
+        {
+            for (int i = 0; i < targets.Length; i++)
+                if (targets[i].transform == target)
+                    return i;
+            throw new System.Exception("error");
         }
 
         public void Awake()
@@ -358,6 +373,24 @@ namespace VoronoiSplitScreen
                 Gizmos.color = Color.magenta;
                 Gizmos.DrawSphere(boundsGizmo.center, 0.2f);
             }
+
+            //Gizmos.color = new Color(1, 0.49f, 0.313f);
+            Gizmos.color = new Color(1, 0, 0.313f);
+            if (splitCameraList!=null)
+                for (int i = 0; i < splitCameraList.Count;i++)
+                {
+                    Vector3 a = splitCameraList[i].TargetInDeadZone[0].position;
+                    Vector3 p = splitCameraList[i].transform.position;
+                    for (int j = 0; j < splitCameraList.Count; j++)
+                    {
+                        if (i == j)
+                            continue;
+                        Vector3 b = splitCameraList[j].TargetInDeadZone[0].position;
+                        Vector3 dest = MathUtils.GetClosestPointOnLineSegment(a, b, p);
+                        Gizmos.DrawLine(p, dest);
+                    }
+                }
+
         }
     }
 

@@ -154,6 +154,17 @@ namespace VoronoiSplitScreen
                 }
             }
         }
+        public float ComputeScreenDistance(Transform otherTarget,int otherTargetId)
+        {
+            Vector3 VoronoiScreenOffset = SplitScreenManager.Singleton.GetPrimaryVoronoiIndication(this);
+
+            Vector3 targetScreenPos = camera.ViewportToWorldPoint(VoronoiScreenOffset) - transform.position;
+            Vector3 otherVoronoiScreenOffset = SplitScreenManager.Singleton.voronoiCameraIndication[otherTargetId];
+            Vector3 otherScreenPos = camera.ViewportToWorldPoint(otherVoronoiScreenOffset) - transform.position;
+            float screenDistance = Vector3.Distance(targetScreenPos, otherScreenPos);
+            float worldDistance = Vector3.Distance(TargetInDeadZone[0].position, otherTarget.transform.position);
+            return  screenDistance- worldDistance;
+        }
         public void UpdateTargets()
         {
             GameObject[] target = SplitScreenManager.Singleton.Targets;
@@ -190,6 +201,26 @@ namespace VoronoiSplitScreen
                 }
             }
         }
+        public Vector3 GetPosition()
+        {
+            Vector3 voronoiScreenOffset = Vector3.zero;
+            for (int i = 0; i < TargetInDeadZone.Count; i++)
+                for (int j = 0; j < SplitScreenManager.Singleton.Targets.Length; j++)
+                    if (targetInDeadZone[i] == SplitScreenManager.Singleton.Targets[j].transform)
+                    {
+                        Vector3 Vconvert = SplitScreenManager.Singleton.voronoiCameraIndication[j];
+                        voronoiScreenOffset += Vconvert;
+                    }
+            voronoiScreenOffset /= TargetInDeadZone.Count;
+            Vector3 playerOffSet = camera.ViewportToWorldPoint(voronoiScreenOffset) - transform.position;
+            Vector3 targetCenter = Vector3.zero;
+            for (int i = 0; i < targetInDeadZone.Count; i++)
+                targetCenter += targetInDeadZone[i].position;
+            targetCenter *= ((float)1 / targetInDeadZone.Count);
+
+            Vector3 cameraPos = targetCenter - playerOffSet;
+            return new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
+        }
         public void FollowMultiplePlayer()
         {
             Vector3 voronoiScreenOffset = Vector3.zero;
@@ -208,7 +239,8 @@ namespace VoronoiSplitScreen
             targetCenter *= ((float)1 / targetInDeadZone.Count);
 
             Vector3 cameraPos = targetCenter - playerOffSet;
-            transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
+            //transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
+            FatherCameraPosition(new Vector3(cameraPos.x, cameraPos.y, transform.position.z));
         }
        
         public void FollowOnePlayer()
@@ -221,7 +253,35 @@ namespace VoronoiSplitScreen
             Vector3 cameraPos = targetCenter - playerOffSet;
             transform.position = new Vector3(cameraPos.x, cameraPos.y, transform.position.z);
         }
-
+        // je lerp entre la ou je suis et la ou je serais si on filmait
+        // 2 joueurs en meme temps. 
+        public void FatherCameraPosition(Vector3 cameraPosition)
+        {
+            SplitScreenCamera otherCamera =null;
+            Vector3 cameraCenter = Vector3.zero;
+            float t = 0;
+            List<SplitScreenCamera> splitCameraList = SplitScreenManager.Singleton.splitCameraList;
+            Vector3 lerpOffset = Vector3.zero;
+            for  (int i = 0; i < splitCameraList.Count;i++)
+            {
+                if (splitCameraList[i]!=this)
+                {
+                    // calculer le centre en les 2 centre de 2 camera Voronoï
+                     cameraCenter = (splitCameraList[i].GetPosition() + GetPosition()) * 0.5f;
+                    
+                    // calculer vrai centre en 2 cameras : 
+                    //cameraCenter = (transform.position + splitCameraList[i].transform.position) * 0.5f;
+                    Transform otherTarget = splitCameraList[i].targetInDeadZone[0];
+                    float minDistance = ComputeScreenDistance(otherTarget, SplitScreenManager.Singleton.GetTargetId(otherTarget));
+                    t = (minDistance + 5)/5;
+                    t = t < 0 ? 0 : t;
+                    t = t > 1 ? 1 : t;
+                    lerpOffset += (cameraCenter - cameraPosition) * t;
+                }
+            }
+            Vector3 finalPosition = cameraPosition + lerpOffset;
+            transform.position = finalPosition;
+        }
        
 
 
@@ -261,6 +321,11 @@ namespace VoronoiSplitScreen
 
                 Gizmos.DrawLine(downRight, downLeft);
                 Gizmos.DrawLine(downLeft, upLeft);
+
+
+
+
+
             }
         }
     }

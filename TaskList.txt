@@ -198,12 +198,40 @@ et l'écran. Ainsi cassure/split.
 diviser par les voronoiBounds.
 La distance entre 2 points me donne l'écartement en ratio des joueurs.
 
+--> On voit dans la video que la différence entre bien merge et mal merge
+est principalement dans l'axe des camera. 
+	--> la ligne de player à player n'est pas dans le meme angle
+	que la ligne de camera à camera.
 
 
 
 
+Idée projeter les camera sur les ligne player to player. (semble coherent à 2 joueurs)
 
+En gros : Si je dessine une ligne de player à player alors la camera devrait être dessus. 
+	--> ca semble marcher à 2 player peut être que ça marche pour n players. 
+Pour plus de 2 joueurs ... 
+	--> je dois plutot me projeter du centre imaginé d'un player à soit un autre centre imaginé soit un player. 
+Il reste 2 problématiques : 
+	--> Je lerp de la ou il faut merge  à + 5mètres.
 
+Autre problème pour N players : Lorsque 2 joueurs se rapprochent en triangle d'un troisième 
+	--> Aller sur une ligne ne semble pas marcher.
+Meme sans prendre cela en compte : 
+lorsque je merge 2 players alors qu'on est nombreux. 
+	--> alors la camera n'est pas du tout sur une ligne entre les 2 players. 
+
+Nouvelle idée : 
+	--> Je remarque le problème car la camera finale entre les 2 joueurs n'est pas placée ainsi. 
+	--> Ne devrais-je pas simplement lerp les camera de là ou elle sont à la ou l'unique camera mergée sera ? 
+Problème : 
+	--> technique comment faire du multiLerp ? 
+	--> Autre : Comment décider/ savoir s'il faut Split / merge.
+
+Actuellement cela ne marchera que pour 2 player car je ne prends pas en compte
+le fait qu'il faut faire la vrai distance en fonction du centre au sol de ce que vise la camera.
+
+	
 
 
 
