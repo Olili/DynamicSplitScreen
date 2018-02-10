@@ -14,6 +14,8 @@ public class PlayerStart : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         playerRef = new GameObject[nbPlayers];
+        // to refacto
+        SplitScreenManager splitManager = FindObjectOfType<SplitScreenManager>();
         for (int i = 0; i < nbPlayers;i++)
         {
             Transform playerPos = transform.GetChild(i);
@@ -22,13 +24,18 @@ public class PlayerStart : MonoBehaviour {
             playerRef[i].GetComponent<SpriteRenderer>().color = playerColors[i];
             playerRef[i].GetComponent<Player>().ID = i;
         }
-        // to refacto
-        SplitScreenManager splitManager = FindObjectOfType<SplitScreenManager>();
-        splitManager.Targets = playerRef;
     }
-	
-	// Update is called once per frame
-	void Update () {
+    public void Start()
+    {
+        SplitScreenManager splitManager = FindObjectOfType<SplitScreenManager>();
+        for (int i = 0; i < nbPlayers; i++)
+        {
+            splitManager.AddTarget(playerRef[i].transform);
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
     public void OnDrawGizmos()

@@ -239,10 +239,13 @@ le fait qu'il faut faire la vrai distance en fonction du centre au sol de ce que
 
 
 
+Qu'est-ce qui se passe entre Pour décider d'un spliut / merge ? 
 
 
-
-
+On va parcourir toutes les ScreenPos des target.
+	On calcule la screenDist
+	On calcule la realDist 
+Mais tout cela est accès pour une seule target. 
 
 
 

@@ -50,9 +50,6 @@ On Resume l'algorithme :
 	--> On certis les centre en Position à l'écran ( 0 -1)
 		--> La camera doit se positionner pour afficher le joueur à cet endroit.
 
-
-
-
 Pour split : 
 
 
@@ -60,4 +57,38 @@ Pour split :
 
 	
 		
+	Resumer   final pour refacto : 
+--> Target (transform players)
+--> Calcul des bounds.
+Pour chaques targets : 
+	--> Voronoi offset.
+	--> Voronoi center.
+Pour chaques Camera :
+	Pour chaques Camera Target
+		--> Moyenne des center -> screenOffset
+	--> Camera position
+	Pour chaques Couple de camera : 
+		Pour chaques Target de chaques camera :
+			--> Moyenne des Voronoi Center : 
+	Lerp entre tout ça.
+
+
+
+
+	J'ai plus besoin de faire le lien
+	Car ces variables sont partagées.
+--> Mais je dois m'assurer que le camera ait ces liens vers 
+class de data. ( ajout et retrait).
+	--> Ajout : 
+		--> début du jeux
+	--> Ajout/retrait avec split
+	--> Ajout avec merge.
+
+
+
+
+
+
+
+
 
