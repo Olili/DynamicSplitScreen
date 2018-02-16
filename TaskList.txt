@@ -31,7 +31,6 @@ S3
 --> Effect sur VoronoïEdges.(séparation ecran)
 --> Coder un Voronoï simplifié.
 --> Coder un constructeur de mesh simplifié.
---> remove PrimaryTarget (gérer le nan in targetDeadZone)
 --> Repalce Vector3 by vector2 where needed.
 --> Recoder le calcul des centre des player à l'écran pour ne pas passer par les poly.
 --> Check minimal bounding box algorithme.

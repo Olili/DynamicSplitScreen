@@ -279,18 +279,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4c4f85ef396ca64caae28082cc87740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targets: []
-  debugMat: {fileID: 2100000, guid: f51dd3b3059963e4d96f70f61e2193fc, type: 2}
+  splitCameraList: []
   stencilDrawer: {fileID: 0}
-  stencilDrawerTab: []
+  debugMat: {fileID: 2100000, guid: f51dd3b3059963e4d96f70f61e2193fc, type: 2}
   splitCameraModel: {fileID: 114896859327025890, guid: d20084b4f3b501d43829eb201c880440,
     type: 2}
-  voronoiRegionPoints: []
-  voronoiRegionCenter: []
-  voronoiCameraIndication: []
-  testVoronoiBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
 --- !u!1 &89528747
 GameObject:
   m_ObjectHideFlags: 0
@@ -739,8 +732,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eebff1781735d1e42b63ac74ecd9c0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetInDeadZone: []
-  targetVoronoiScreenOffset: {x: 0, y: 0}
   id: 0
 --- !u!81 &365632887
 AudioListener:
@@ -1005,7 +996,7 @@ Prefab:
     - target: {fileID: 114685421802520192, guid: 16447ec67a095cc409aba5c6475bf294,
         type: 2}
       propertyPath: nbPlayers
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4863601645241558, guid: 16447ec67a095cc409aba5c6475bf294, type: 2}
       propertyPath: m_LocalPosition.x
@@ -1427,6 +1418,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eebff1781735d1e42b63ac74ecd9c0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetInDeadZone: []
-  targetVoronoiScreenOffset: {x: 0, y: 0}
   id: 0

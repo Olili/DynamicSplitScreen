@@ -1,0 +1,16 @@
+
+
+	Refacto commadn buffer : 
+--> Actuellement 
+	--> j'envois mes mask pendant l'udate
+	--> juste après que la camera ait rendu la scene 
+	--> je récupère la texture de la camera précédente. 
+	--> je dessine par dessus la camera précédente ce que 
+	filme la camera actuelle en filtrant grace au masque. 
+--> Problèmes : 
+	--> Lorsqu'il y aura des images effect ils seront appliqués plusieurs fois. 
+	--> Bug mystique :  de temps en temps on ne voit que ce qu'affiche la cam1.
+	-->  il semble pour les camera 2 et suite que les masque est total. 
+		-->réglé lorsqu'on interdit le dynamic batching. 
+
+

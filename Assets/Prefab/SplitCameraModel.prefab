@@ -88,6 +88,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eebff1781735d1e42b63ac74ecd9c0e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetInDeadZone: []
-  targetVoronoiScreenPos: {x: 0, y: 0}
   id: 0

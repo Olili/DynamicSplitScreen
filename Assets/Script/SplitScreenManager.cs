@@ -14,6 +14,7 @@ namespace VoronoiSplitScreen
         public Vector2 voronoiRegionCenter; // [0,1] viewPort position of the center of a voronoi Region
         public Vector2 screenOffset; // unused ? 
         public Mesh polyMask; // polygone mask used to stencil out part of the screen.
+        public SplitScreenCamera camera;
         public TargetData(Transform _target)
         {
             target = _target;
@@ -30,8 +31,8 @@ namespace VoronoiSplitScreen
 
         // Not Good : 
         [SerializeField] Material stencilDrawer;
-        [SerializeField] Material[] stencilDrawerTab;
-        Color[] debugColor = new Color[6] { Color.magenta,Color.white, Color.black, Color.red,  Color.cyan,Color.grey};
+        public static  Material[] stencilDrawerTab;
+        public static Color[] debugColor = new Color[6] { Color.magenta,Color.white, Color.black, Color.red,  Color.cyan,Color.grey};
 
             // A refacto
         [SerializeField] Material debugMat;
@@ -151,7 +152,7 @@ namespace VoronoiSplitScreen
        
         public void Merge(TargetData targetTwo, SplitScreenCamera firstCam)
         {
-            SplitScreenCamera toRemove = GetSplitCamera(targetTwo.target.transform);
+            SplitScreenCamera toRemove = GetSplitCamera(targetTwo);
             if (toRemove == splitCameraList[0])
                 return;
             Debug.Log(firstCam + " Merging " + targetTwo);
@@ -217,11 +218,10 @@ namespace VoronoiSplitScreen
             return null;
         }
         // Shoundn't by needed ( reorganise)
-        public SplitScreenCamera GetSplitCamera(Transform target)
+        public SplitScreenCamera GetSplitCamera(TargetData targetData)
         {
             for (int i = 0; i < splitCameraList.Count; i++)
-                for (int j = 0; j < splitCameraList[i].targetsData.Count; j++)
-                    if (splitCameraList[i].targetsData[j].target == target)
+                if (targetData.camera!=null && splitCameraList[i] == targetData.camera)
                         return splitCameraList[i];
             return null;
         }
@@ -230,8 +230,21 @@ namespace VoronoiSplitScreen
         {
             if (splitCameraList.Count < 2)
                 return;
+            //for (int i = 0; i < splitCameraList.Count; i++)
+            //    splitCameraList[i].DrawPolyMask(splitCameraList[0].GetComponent<Camera>(), stencilDrawerTab);
+            //for (int i = 0; i < splitCameraList.Count; i++)
+            //    splitCameraList[i].DrawPolyMask(splitCameraList[0].GetComponent<Camera>(), stencilDrawerTab[splitCameraList[i].ID]);
             for (int i = 0; i < splitCameraList.Count; i++)
-                splitCameraList[i].DrawPolyMask(splitCameraList[0].GetComponent<Camera>(), stencilDrawerTab);
+                for (int j = 0; j < targetsData.Count; j++)
+                {
+                    TargetData targetData = targetsData[j];
+                    Vector3 position = splitCameraList[i].transform.position + splitCameraList[i].transform.forward;
+                    Graphics.DrawMesh(targetData.polyMask, position, Quaternion.identity, stencilDrawerTab[targetData.camera.ID], 0, splitCameraList[i].GetComponent<Camera>());
+                    Material debugMat = new Material(Shader.Find("Sprites/Default"));
+                    debugMat.color = debugColor[targetData.camera.ID];
+                    Graphics.DrawMesh(targetData.polyMask, position, Quaternion.identity, debugMat, 0, splitCameraList[i].GetComponent<Camera>());
+                    //splitCameraList[i].DrawPolyMask(splitCameraList[j].GetComponent<Camera>(), stencilDrawerTab[splitCameraList[i].ID]);
+                }
         }
 
         public void Awake()
@@ -254,6 +267,8 @@ namespace VoronoiSplitScreen
                 SplitScreenCamera splitCamera = transform.GetChild(i).GetComponentInChildren<SplitScreenCamera>();
                 splitCamera.Init(targetsData[i], i);
                 splitCameraList.Add(splitCamera);
+                //for (int j = 0; j < targetsData.Count;j++)
+                targetsData[i].camera = splitCamera;
             }
         }
         

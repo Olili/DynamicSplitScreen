@@ -10,7 +10,7 @@ namespace VoronoiSplitScreen
     {
         new Camera camera;
         [SerializeField] int id;
-        public List<TargetData> targetsData;
+        private List<TargetData> targetsData;
 
             // Command Buffer
         Mesh quadPerso;
@@ -24,7 +24,6 @@ namespace VoronoiSplitScreen
         public int ID
         {
             get { return id; }
-            set { id = value; }
         }
 
         #endregion
@@ -34,7 +33,6 @@ namespace VoronoiSplitScreen
         {
             if (quadPerso == null)
                 quadPerso = MeshHelper.GetQuad();
-           
 
             if (lastCameraRender == null)
             {
@@ -68,6 +66,7 @@ namespace VoronoiSplitScreen
                     cmdBufferStencil.ClearRenderTarget(false, true, Color.black);
                 else
                     cmdBufferStencil.Blit(lastCameraRenderId, BuiltinRenderTextureType.CameraTarget);
+
                 // je draw dans MyCameraRd dans  MyCameraRd qui est de nouveau la renderTarget
                 cmdBufferStencil.DrawMesh(quadPerso, Matrix4x4.identity, stencilRenderer, 0, 0);
 
@@ -102,10 +101,12 @@ namespace VoronoiSplitScreen
             targetsData.Add(targetData);
             SetID(_Id);
             InitCommmandBuffer();
+            targetData.camera = this;
         }
         public void AddTarget(TargetData _targetData)
         {
             targetsData.Add(_targetData);
+            _targetData.camera = this;
         }
         public void RemoveTarget(TargetData _targetData)
         {
@@ -252,12 +253,16 @@ namespace VoronoiSplitScreen
 
 
        
-        public void DrawPolyMask(Camera targetCamera,Material[] stencilDrawerTab)
+        public void DrawPolyMask(Camera targetCamera,Material stencilDrawerTab)
         {
+            //targetCamera = camera;
             for (int i = 0;i < targetsData.Count;i++)
             {
                 Vector3 position = targetCamera.transform.position + targetCamera.transform.forward;
-                Graphics.DrawMesh(targetsData[i].polyMask, position, Quaternion.identity, stencilDrawerTab[id], 0, targetCamera);
+                Graphics.DrawMesh(targetsData[i].polyMask, position, Quaternion.identity, stencilDrawerTab, 0, targetCamera);
+                Material debugMat = new Material(Shader.Find("Sprites/Default"));
+                debugMat.color = SplitScreenManager.debugColor[i];
+                Graphics.DrawMesh(targetsData[i].polyMask, position, Quaternion.identity, debugMat, 0, targetCamera);
             }
         }
 
