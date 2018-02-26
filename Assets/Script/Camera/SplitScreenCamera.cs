@@ -231,7 +231,7 @@ namespace VoronoiSplitScreen
 
                     float minDistance = ComputeScreenDistance(splitCameraList[i].targetsData);
                     float distanceLerp = 5;
-                    t = (minDistance + distanceLerp) / distanceLerp;
+                    t = (minDistance + SplitScreenManager.Singleton.featherDistance) / SplitScreenManager.Singleton.featherDistance;
                     t = t < 0 ? 0 : t;
                     t = t > 1 ? 1 : t;
                     lerpOffset += (cameraCenter - cameraPosition) * t;

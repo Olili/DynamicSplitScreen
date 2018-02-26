@@ -69,6 +69,21 @@ namespace VoronoiSplitScreen
             polygone.triangles = indices;
             polygone.RecalculateNormals();
             polygone.RecalculateBounds();
+
+#if UNITY_EDITOR
+            Vector3[] debugVertices = new Vector3[sitePolyVertices2D.Length];
+            for (int i = 0; i < vertices.Length; i++)
+                debugVertices[i] = (new Vector3((sitePolyVertices2D[i].x),
+                                                (sitePolyVertices2D[i].y * -1)));
+            Mesh worldMask = new Mesh();
+            worldMask.vertices = debugVertices;
+            worldMask.triangles = indices;
+            worldMask.RecalculateNormals();
+            worldMask.RecalculateBounds();
+            SplitScreenManager.Singleton.targetsData[site].worldpolyMask = worldMask;
+
+#endif
+
             return polygone;
         }
 

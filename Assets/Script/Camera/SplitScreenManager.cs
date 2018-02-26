@@ -21,6 +21,9 @@ namespace VoronoiSplitScreen
             target = _target;
             polyMask = null;
         }
+#if UNITY_EDITOR
+        [HideInInspector] public Mesh worldpolyMask;
+#endif
     }
 
     public class SplitScreenManager : MonoBehaviour
@@ -28,7 +31,7 @@ namespace VoronoiSplitScreen
         static SplitScreenManager singleton;
         public List<SplitScreenCamera> splitCameraList;
         [SerializeField] public List<TargetData> targetsData = new List<TargetData>();
-        Bounds worldBounds;
+        public Bounds worldBounds;
 
         // Not Good : 
         [SerializeField] Material stencilDrawer;
@@ -37,6 +40,7 @@ namespace VoronoiSplitScreen
             // A refacto
         [SerializeField] Material debugMat;
         [SerializeField] SplitScreenCamera splitCameraModel;
+        public float featherDistance = 5;
 
 
         //List <Mesh> polyMaskList;
@@ -285,9 +289,10 @@ namespace VoronoiSplitScreen
 #if UNITY_EDITOR
         public bool showVoronoiCenter;
         public static Color[] debugColor = new Color[7]
-        { Color.magenta,Color.cyan,Color.yellow, Color.white, Color.red, Color.black,  Color.grey };
+        { Color.cyan,Color.yellow, Color.white, Color.magenta,Color.red, Color.black,  Color.grey };
         [HideInInspector]public Bounds boundsGizmo;
         public bool showVoronoiBounds;
+        public bool showWorldMask;
 #endif
     }
 }

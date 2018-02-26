@@ -7,7 +7,7 @@ namespace VoronoiSplitScreen
 {
     public static class SplitManagerGizmo  {
 
-        [DrawGizmo(GizmoType.Active | GizmoType.Selected)]
+        [DrawGizmo(GizmoType.Active)]
         static void DrawNormalGizmos(SplitScreenManager splitScreenManager, GizmoType drawnGizmoType)
         {
             if (splitScreenManager.showVoronoiCenter)
@@ -34,6 +34,17 @@ namespace VoronoiSplitScreen
                 //Gizmos.color = Color.magenta;
                 //Gizmos.DrawSphere(boundsGizmo.center, 0.2f);
             }
+            if (splitScreenManager.showWorldMask)
+            {
+                for (int i = 0; i < splitScreenManager.targetsData.Count; i++)
+                {
+                    Vector3 center = splitScreenManager.worldBounds.center;
+                    Mesh mesh = splitScreenManager.targetsData[i].worldpolyMask;
+                    Gizmos.color = SplitScreenManager.debugColor[i]*0.6f;
+                    Gizmos.DrawMesh(mesh, 0, center, Quaternion.Euler(180, 0, 0));
+                }
+            }
+            
         }
     }
 
