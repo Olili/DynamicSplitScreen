@@ -14,3 +14,5 @@
 		-->réglé lorsqu'on interdit le dynamic batching. 
 
 
+BugListe : 
+--> Lorsqu'on est entre 2 joeur et qu'on merge avec l'un des 2 une coupure apparrait;
