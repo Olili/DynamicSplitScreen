@@ -27,7 +27,7 @@ namespace VoronoiSplitScreen
     {
         static SplitScreenManager singleton;
         public List<SplitScreenCamera> splitCameraList;
-        [SerializeField] public List<TargetData> targetsData;
+        [SerializeField] public List<TargetData> targetsData = new List<TargetData>();
         Bounds worldBounds;
 
         // Not Good : 
@@ -250,7 +250,7 @@ namespace VoronoiSplitScreen
         public void Awake()
         {
             singleton = this;
-            targetsData = new List<TargetData>();
+            
             splitCameraList = new List<SplitScreenCamera>();
             stencilDrawerTab = new Material[7];
             for (int i = 0; i < stencilDrawerTab.Length; i++)

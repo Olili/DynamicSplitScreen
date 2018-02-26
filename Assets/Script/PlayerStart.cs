@@ -23,10 +23,6 @@ public class PlayerStart : MonoBehaviour {
             playerRef[i].GetComponent<SpriteRenderer>().color = SplitScreenManager.debugColor[i];
             playerRef[i].GetComponent<Player>().ID = i;
         }
-    }
-    public void Start()
-    {
-        SplitScreenManager splitManager = FindObjectOfType<SplitScreenManager>();
         for (int i = 0; i < nbPlayers; i++)
         {
             splitManager.AddTarget(playerRef[i].transform);
