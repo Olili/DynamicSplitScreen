@@ -6,7 +6,6 @@ using VoronoiSplitScreen;
 
 public class PlayerStart : MonoBehaviour {
 
-    [SerializeField]Color[] playerColors;
     [Range(1,8)][SerializeField] int nbPlayers;
     [SerializeField] GameObject playerModel;
     GameObject[] playerRef;
@@ -21,7 +20,7 @@ public class PlayerStart : MonoBehaviour {
             Transform playerPos = transform.GetChild(i);
             playerRef[i] = Instantiate(playerModel, playerPos.position,Quaternion.identity);
             playerRef[i].name = "player " + i;
-            playerRef[i].GetComponent<SpriteRenderer>().color = playerColors[i];
+            playerRef[i].GetComponent<SpriteRenderer>().color = SplitScreenManager.debugColor[i];
             playerRef[i].GetComponent<Player>().ID = i;
         }
     }
