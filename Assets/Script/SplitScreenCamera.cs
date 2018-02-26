@@ -10,7 +10,7 @@ namespace VoronoiSplitScreen
     {
         new Camera camera;
         [SerializeField] int id;
-        private List<TargetData> targetsData;
+        [SerializeField]private List<TargetData> targetsData;
 
             // Command Buffer
         Mesh quadPerso;
@@ -116,7 +116,7 @@ namespace VoronoiSplitScreen
         {
             TargetData farthestTarget = null;
             float maxDist = 0;
-            for (int i = 1; i < targetsData.Count; i++)
+            for (int i = 0; i < targetsData.Count; i++)
             {
                 float distance = Vector3.Distance(targetsData[i].target.position, transform.position);
                 if (distance > maxDist)
@@ -230,7 +230,8 @@ namespace VoronoiSplitScreen
                     cameraCenter = GetPosition(twoCameraList);
 
                     float minDistance = ComputeScreenDistance(splitCameraList[i].targetsData);
-                    t = (minDistance + 5) / 5;
+                    float distanceLerp = 5;
+                    t = (minDistance + distanceLerp) / distanceLerp;
                     t = t < 0 ? 0 : t;
                     t = t > 1 ? 1 : t;
                     lerpOffset += (cameraCenter - cameraPosition) * t;

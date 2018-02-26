@@ -6,15 +6,16 @@ namespace VoronoiSplitScreen
 {
     using Voronoi2;
 
+    [System.Serializable]
     public class TargetData
     {
         public Transform target; // transform of a followed target
-        public Vector2 voronoiPos; // [0,1] viewPort Position of Voronoi.
-        public Vector2 voronoiViewPort; // [0,1] viewPort Position of Voronoi.
-        public Vector2 voronoiRegionCenter; // [0,1] viewPort position of the center of a voronoi Region
-        public Vector2 screenOffset; // unused ? 
-        public Mesh polyMask; // polygone mask used to stencil out part of the screen.
-        public SplitScreenCamera camera;
+        [HideInInspector] public Vector2 voronoiPos; // [0,1] viewPort Position of Voronoi.
+        [HideInInspector] public Vector2 voronoiViewPort; // [0,1] viewPort Position of Voronoi.
+        [HideInInspector] public Vector2 voronoiRegionCenter; // [0,1] viewPort position of the center of a voronoi Region
+        [HideInInspector] public Vector2 screenOffset; // unused ? 
+        [HideInInspector] public Mesh polyMask; // polygone mask used to stencil out part of the screen.
+        [HideInInspector] public SplitScreenCamera camera;
         public TargetData(Transform _target)
         {
             target = _target;
@@ -240,9 +241,9 @@ namespace VoronoiSplitScreen
                     TargetData targetData = targetsData[j];
                     Vector3 position = splitCameraList[i].transform.position + splitCameraList[i].transform.forward;
                     Graphics.DrawMesh(targetData.polyMask, position, Quaternion.identity, stencilDrawerTab[targetData.camera.ID], 0, splitCameraList[i].GetComponent<Camera>());
-                    Material debugMat = new Material(Shader.Find("Sprites/Default"));
-                    debugMat.color = debugColor[targetData.camera.ID];
-                    Graphics.DrawMesh(targetData.polyMask, position, Quaternion.identity, debugMat, 0, splitCameraList[i].GetComponent<Camera>());
+                    //Material debugMat = new Material(Shader.Find("Sprites/Default"));
+                    //debugMat.color = debugColor[targetData.camera.ID];
+                    //Graphics.DrawMesh(targetData.polyMask, position, Quaternion.identity, debugMat, 0, splitCameraList[i].GetComponent<Camera>());
                     //splitCameraList[i].DrawPolyMask(splitCameraList[j].GetComponent<Camera>(), stencilDrawerTab[splitCameraList[i].ID]);
                 }
         }
